@@ -24,8 +24,6 @@ public class User {
     @Column(name = "LAST_NAME")
     private String lastName;
 
-    private Set<Integer> songsID;
-
     public Long getId() {
         return id;
     }
