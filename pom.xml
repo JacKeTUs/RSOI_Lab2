@@ -6,6 +6,12 @@
 	<groupId>com.jacketus</groupId>
 	<artifactId>RSOI_Lab2</artifactId>
 	<version>0.1</version>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+	</dependencies>
 	<packaging>pom</packaging>
 
 	<name>RSOI_Lab2</name>
@@ -20,6 +26,7 @@
 
 	<modules>
 		<module>songs-service</module>
+		<module>users-service</module>
 	</modules>
 
 </project>
