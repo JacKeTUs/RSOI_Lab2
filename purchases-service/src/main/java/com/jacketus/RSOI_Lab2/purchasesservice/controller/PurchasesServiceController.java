@@ -23,10 +23,11 @@ public class PurchasesServiceController {
         logger = LoggerFactory.getLogger(PurchasesServiceController.class);
     }
 
+
     @PostMapping(value = "/purchases")
-    public void createPurchase(@RequestBody Purchase purchase){
+    public void addPurchase(@RequestBody Purchase purchase) {
+        logger.info("[POST] /purchases");
         purchasesService.createPurchase(purchase);
-        logger.info("[POST] /purchases", purchase);
     }
 
     @GetMapping(value = "/purchases")

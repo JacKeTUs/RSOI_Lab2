@@ -12,5 +12,6 @@ public interface PurchasesService {
     boolean checkPurchaseBySongForUser(Long userID, Long songID);
     List<Purchase> getAllPurchases();
     void createPurchase(Purchase purchase);
+    //void addPurchase(Long songID, Long userID);
 }
 

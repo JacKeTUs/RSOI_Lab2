@@ -54,6 +54,7 @@ public class PurchasesServiceImplementation implements PurchasesService{
 
     @Override
     public void createPurchase(Purchase purchase) {
+        System.out.println(purchase.toString());
         purchasesRepository.save(purchase);
     }
 }

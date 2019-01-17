@@ -25,6 +25,14 @@ public class SongsServiceImplementation implements SongsService {
     }
 
     @Override
+    public Song getSongByID (Long id) throws SongNotFoundException {
+        Song song =  songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+        return song;
+    }
+
+
+    @Override
     public void createSong(Song song) {
         songsRepository.save(song);
     }
