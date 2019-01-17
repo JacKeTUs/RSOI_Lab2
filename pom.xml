@@ -11,7 +11,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+        </dependency>
+    </dependencies>
 	<packaging>pom</packaging>
 
 	<name>RSOI_Lab2</name>
@@ -27,6 +31,7 @@
 	<modules>
 		<module>songs-service</module>
 		<module>users-service</module>
+		<module>purchases-service</module>
 	</modules>
 
 </project>
