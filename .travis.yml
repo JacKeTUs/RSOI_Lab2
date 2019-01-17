@@ -11,7 +11,7 @@ services:
 before_script:
 - psql -c "CREATE database songs_db;
            CREATE role prorgam WITH password 'test';
-           GRANT ALL PRIVELEGES ON database songs_db TO program;
+           GRANT ALL PRIVILEGES ON database songs_db TO program;
            ALTER role program WITH login;" -U postgres
 
 after_success:
