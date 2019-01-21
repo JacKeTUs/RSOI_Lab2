@@ -82,7 +82,7 @@ public class GatewayServiceController {
     // Добавить рейтинг песне
     @PostMapping(value = "/users/{userID}/songs/{songID}/rate")
     public void addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException {
-        logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: ", rate);
+        logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: " + rate);
         gatewayService.addRatingForSong(userID, songID, rate);
     }
 

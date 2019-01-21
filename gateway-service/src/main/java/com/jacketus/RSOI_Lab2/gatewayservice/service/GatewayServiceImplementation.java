@@ -177,9 +177,9 @@ public class GatewayServiceImplementation implements GatewayService {
             e.printStackTrace();
         }
 
-        HttpPost request2 = new HttpPost(purchasesServiceUrl + "/purchases/"+p_id+"/rate&rating=" + rate);
+        HttpPost request2 = new HttpPost(purchasesServiceUrl + "/purchases/"+p_id+"/rate?rating=" + rate);
 
-        HttpPost request3 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/rate&rating=" + rate);
+        HttpPost request3 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/rate?rating=" + rate);
 
         httpClient.execute(request2);
         httpClient.execute(request3);

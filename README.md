@@ -51,3 +51,7 @@ psql -c "alter role program WITH login" -U postgres
 
 ```curl -X POST -i --header "content-type: application/json" -d '{"userID":1, "songID":1}' "localhost:8088/api/purchase"```
 
+
+Оценка песни:
+
+```curl -X POST "localhost:8088/api/users/1/songs/1/rate?rating=4"```
