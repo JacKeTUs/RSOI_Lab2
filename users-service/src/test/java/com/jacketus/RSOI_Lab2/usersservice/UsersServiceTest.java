@@ -13,10 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
+
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 public class UsersServiceTest {
     private UsersService usersService;
@@ -34,20 +39,20 @@ public class UsersServiceTest {
     public void shouldReturnAllUsers(){
         List<User> users= new ArrayList<>();
         User user= new User();
-        user.setLastName("LastName");
+
         user.setName("Name");
         user.setLogin("Login");
 
         given(usersRepository.findAll()).willReturn(users);
         List<User> usersReturned = usersService.getAllUsers();
         assertThat(usersReturned, is(users));
+
     }
 
     @Test
     public void shouldCreateUser(){
         User user = new User();
 
-        user.setLastName("LastName");
         user.setName("Name");
         user.setLogin("Login");
 
@@ -59,7 +64,6 @@ public class UsersServiceTest {
     public void shouldFindUserById() throws UserNotFoundException {
         User user = new User();
 
-        user.setLastName("LastName");
         user.setName("Name");
         user.setLogin("Login");
 
@@ -68,19 +72,100 @@ public class UsersServiceTest {
 
         usersService.createUser(user);
         assertThat(usersService.findUserById(user.getId()), is(user));
+
+        assertEquals("Login", user.getLogin());
+        assertEquals("Name", user.getName());
     }
 
     @Test
     public void shouldFindUserByLogin() throws UserNotFoundException {
         User user = new User();
-        user.setLastName("LastName");
+
         user.setName("Name");
         user.setLogin("Login");
 
         given(usersRepository.save(user)).willReturn(user);
+
         given(usersRepository.findByLogin("Login")).willReturn(user);
+        given(usersRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         usersService.createUser(user);
         assertThat(usersService.findUserByLogin("Login"), is(user));
+    }
+
+    @Test
+    public void shouldIncBuyNum() throws UserNotFoundException {
+        User user = new User();
+        user.setName("Name");
+        user.setLogin("Login");
+
+        given(usersRepository.save(user)).willReturn(user);
+        given(usersRepository.findById(user.getId())).willReturn(Optional.of(user));
+        User saved = usersRepository.save(user);
+
+        Long id = saved.getId();
+        usersService.incBuyNum(id);
+
+        assertEquals(1, usersService.findUserById(id).getBuy_num());
+    }
+
+    @Test
+    public void shouldHash(){
+        User user = new User();
+        user.setName("Name");
+        user.setLogin("Login");
+
+        try {
+            given(usersRepository.save(user)).willReturn(user);
+            given(usersRepository.findById(user.getId())).willReturn(Optional.of(user));
+            User saved = usersRepository.save(user);
+
+
+            assertNotNull(saved.hashCode());
+        }
+        catch (Exception ex){
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldToString(){
+        User user = new User();
+        user.setName("Name");
+        user.setLogin("Login");
+
+        String s = "User{id=null, login='Login', name='Name', buy_num='0'}";
+
+        try {
+            given(usersRepository.save(user)).willReturn(user);
+            given(usersRepository.findById(user.getId())).willReturn(Optional.of(user));
+            User saved = usersRepository.save(user);
+
+            System.out.println(saved.toString());
+            assertEquals(s, saved.toString());
+        }
+        catch (Exception ex){
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldEquals(){
+        User user = new User();
+        user.setName("Name");
+        user.setLogin("Login");
+
+        try {
+            given(usersRepository.save(user)).willReturn(user);
+            given(usersRepository.findById(user.getId())).willReturn(Optional.of(user));
+            User saved = usersRepository.save(user);
+
+
+            boolean eq = user.equals(saved);
+            assertEquals(true, eq);
+        }
+        catch (Exception ex){
+            fail();
+        }
     }
 }

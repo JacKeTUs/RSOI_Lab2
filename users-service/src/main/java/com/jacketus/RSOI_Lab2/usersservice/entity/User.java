@@ -21,8 +21,9 @@ public class User {
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "LAST_NAME")
-    private String lastName;
+    @Column(name = "BUY_NUM")
+    private int buy_num;
+
 
     public Long getId() {
         return id;
@@ -44,12 +45,12 @@ public class User {
         this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public int getBuy_num() {
+        return buy_num;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setBuy_num(int buy_num) {
+        this.buy_num = buy_num;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class User {
                 .append(id, user.id)
                 .append(login, user.login)
                 .append(name, user.name)
-                .append(lastName, user.lastName)
+                .append(buy_num, user.buy_num)
                 .isEquals();
     }
 
@@ -74,17 +75,17 @@ public class User {
                 .append(id)
                 .append(login)
                 .append(name)
-                .append(lastName)
+                .append(buy_num)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
+                    "id=" + id + ", " +
+                    "login='" + login + '\'' + ", " +
+                    "name='" + name + '\'' + ", " +
+                    "buy_num='" + buy_num + '\'' +
                 '}';
     }
 }

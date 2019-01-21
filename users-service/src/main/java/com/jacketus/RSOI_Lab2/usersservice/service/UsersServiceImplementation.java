@@ -37,7 +37,14 @@ public class UsersServiceImplementation implements UsersService{
     }
 
     @Override
-    public void createUser(User user) {
-        usersRepository.save(user);
+    public void incBuyNum(Long id) throws UserNotFoundException{
+        User user = usersRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        user.setBuy_num(user.getBuy_num() + 1);
+    }
+
+    @Override
+    public User createUser(User user) {
+        return usersRepository.save(user);
     }
 }

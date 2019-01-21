@@ -10,9 +10,11 @@ public interface UsersService {
 
     User findUserByLogin(String login) throws UserNotFoundException;
 
+    void incBuyNum(Long id) throws UserNotFoundException;
+
     List<User> getAllUsers();
 
-    void createUser(User user);
+    User createUser(User user);
 }
 
 
