@@ -53,8 +53,8 @@ public class GatewayServiceController {
 
     // Посмотреть все песни пользователя (все его покупки)
     @GetMapping(path = "/users/{userId}/songs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getSongsByUser(@PathVariable Long userId, @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) throws IOException, JSONException {
-        logger.info("[GET] /users/" + userId + "/songs, page: " + page + ", size: " + size);
+    public String getSongsByUser(@PathVariable Long userId) throws IOException, JSONException {
+        logger.info("[GET] /users/" + userId + "/songs");
         return gatewayService.getSongsByUser(userId);
     }
 

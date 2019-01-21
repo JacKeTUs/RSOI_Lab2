@@ -143,7 +143,7 @@ public class PurchasesServiceTest {
         Purchase purchase = new Purchase();
         purchase.setSongID(5L);
         purchase.setUserID(1L);
-        String s = "Purchase{id=null, user_id='1', song_id='5', rating='0'}";
+        String s = "Purchase{id=null, userID='1', songID='5', rating='0'}";
 
         try {
             given(purchasesRepository.save(purchase)).willReturn(purchase);
