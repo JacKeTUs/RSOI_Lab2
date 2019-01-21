@@ -25,29 +25,40 @@ public class SongsServiceController {
         logger  = LoggerFactory.getLogger(SongsServiceImplementation.class);
     }
 
+    // Получение списка песен
     @GetMapping(value = "/songs")
     public List<Song> getAllSongs(){
         logger.info("[GET] /songs ");
         return songsService.getAllSongs();
     }
 
+    // Получение информации об одной песне
     @GetMapping(value = "/songs/{id}")
     public Song getSongByID(@PathVariable Long id) throws SongNotFoundException {
         logger.info("[GET] /songs/ " + id);
         return songsService.getSongByID(id);
     }
 
+    // Добавление песни на сайт
     @PostMapping(value = "/songs")
     public void createSong(@RequestBody Song song){
         logger.info("[POST] /songs ", song);
         songsService.createSong(song);
     }
 
-    @PostMapping(value = "songs/{id}/setRating/{rating}")
-    public void setRating(@PathVariable Long id, @RequestBody String rating) throws SongNotFoundException {
+    // Оценка песни
+    @PostMapping(value = "songs/{id}/rate/{rating}")
+    public void setRating(@PathVariable Long id, @PathVariable String rating) throws SongNotFoundException {
 
         double rate = Double.parseDouble(rating);
         songsService.setRating(id, rate);
-        logger.info("[POST] /songs/" + id + "/setRating/" + rate);
+        logger.info("[POST] /songs/" + id + "/rate/" + rate);
+    }
+
+    // Покупка песни
+    @PostMapping(value = "/songs/{id}/buy")
+    public void buySong(@PathVariable Long id) throws SongNotFoundException {
+        songsService.incBuyNum(id);
+        logger.info("[POST] /songs/" + id + "/buy");
     }
 }

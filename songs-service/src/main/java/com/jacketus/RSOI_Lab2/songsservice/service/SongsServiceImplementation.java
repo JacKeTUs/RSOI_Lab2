@@ -6,6 +6,7 @@ import com.jacketus.RSOI_Lab2.songsservice.entity.Song;
 import com.jacketus.RSOI_Lab2.songsservice.exception.SongNotFoundException;
 import com.jacketus.RSOI_Lab2.songsservice.repository.SongsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class SongsServiceImplementation implements SongsService {
     }
 
     @Override
-    public List<Song> getAllSongs () {
+    public List<Song> getAllSongs() {
         return songsRepository.findAll();
     }
 
@@ -30,7 +31,6 @@ public class SongsServiceImplementation implements SongsService {
                 .orElseThrow(() -> new SongNotFoundException(id));
         return song;
     }
-
 
     @Override
     public void createSong(Song song) {
@@ -56,9 +56,25 @@ public class SongsServiceImplementation implements SongsService {
     public double getRating(Long id) throws SongNotFoundException {
         Song song = songsRepository.findById(id)
                 .orElseThrow(() -> new SongNotFoundException(id));
-        double res = song.getRating();
-        songsRepository.save(song);
-        return res;
+        return song.getRating();
     }
+
+    @Override
+    public void incBuyNum(Long id) throws SongNotFoundException {
+        Song song = songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+
+        song.setBuy_nums(song.getBuy_nums() + 1);
+        songsRepository.save(song);
+    }
+
+    @Override
+    public int getBuyNum(Long id) throws SongNotFoundException {
+        Song song = songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+
+        return song.getBuy_nums();
+    }
+
 
 }

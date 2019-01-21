@@ -12,4 +12,6 @@ public interface SongsService {
     void setRating(Long id, double rating) throws SongNotFoundException;
     double getRating(Long id) throws SongNotFoundException;
     int getRateNum(Long id) throws SongNotFoundException;
+    void incBuyNum(Long id) throws SongNotFoundException;
+    int getBuyNum(Long id) throws SongNotFoundException;
 }
