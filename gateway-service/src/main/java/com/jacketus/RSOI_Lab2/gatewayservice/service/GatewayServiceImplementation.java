@@ -33,6 +33,24 @@ public class GatewayServiceImplementation implements GatewayService {
     final private String purchasesServiceUrl = "http://localhost:8072";
 
     @Override
+    public String getSongs() throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(songsServiceUrl + "/songs");
+        HttpResponse response = httpClient.execute(request);
+
+        return EntityUtils.toString(response.getEntity());
+    }
+
+    @Override
+    public String getSongByID(Long songID) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(songsServiceUrl + "/songs/"+songID);
+        HttpResponse response = httpClient.execute(request);
+
+        return EntityUtils.toString(response.getEntity());
+    }
+
+    @Override
     public String getUserById(Long userId) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(usersServiceUrl + "/users/" + userId);
@@ -58,54 +76,37 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
     @Override
-    public String getSongs() throws IOException {
+    public String getUserSong(Long userId, Long songId) throws IOException {
+        String res = "";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(songsServiceUrl + "/songs");
+        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/check?user_id=" + userId + "&song_id=" + songId);
         HttpResponse response = httpClient.execute(request);
-
-        return EntityUtils.toString(response.getEntity());
-    }
-
-    @Override
-    public String getSongByID(Long songID) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(songsServiceUrl + "/songs/"+songID);
-        HttpResponse response = httpClient.execute(request);
-
-        return EntityUtils.toString(response.getEntity());
-    }
-
-    @Override
-    public void addSong(@RequestBody String song) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        StringEntity p = new StringEntity(song);
-        HttpPost request = new HttpPost(songsServiceUrl + "/songs");
-        request.addHeader("content-type", "application/json");
-        request.setEntity(p);
-        HttpResponse response = httpClient.execute(request);
-    }
-
-    @Override
-    public void addRatingForSong(Long songID, double rate) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost request = new HttpPost(songsServiceUrl + "/songs/"+songID);
-
-        StringEntity params =new StringEntity(String.valueOf(rate));
-        request.addHeader("content-type", "application/json");
-        request.setEntity(params);
-
-        HttpResponse response = httpClient.execute(request);
-    }
-
-    @Override
-    public void getSongPurchases(Long songID) throws IOException {
-        // Проверка, есть ли такая песня
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request1 = new HttpGet(songsServiceUrl + "/songs/"+songID);
-        HttpResponse response1 = httpClient.execute(request1);
-        if (!EntityUtils.toString(response1.getEntity()).isEmpty()) {
-
+        Long p_id = 0L;
+        try {
+            JSONObject p = new JSONObject(EntityUtils.toString(response.getEntity()));
+            p_id = p.getLong("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        res += this.getPurchase(p_id);
+
+        request = new HttpGet(songsServiceUrl + "/songs/" + songId);
+        HttpResponse response3 = httpClient.execute(request);
+        res += EntityUtils.toString(response3.getEntity());
+
+        return res;
+    }
+
+    @Override
+    public String getPurchase(Long ID) throws IOException {
+        String res = "";
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/" + ID);
+        HttpResponse response2 = httpClient.execute(request);
+        res += EntityUtils.toString(response2.getEntity());
+
+        return res;
     }
 
     @Override
@@ -115,6 +116,7 @@ public class GatewayServiceImplementation implements GatewayService {
         String p2 = purchase;
         StringEntity p = new StringEntity(purchase);
 
+        // Проверяем, есть ли такие песни в базах
         Long songID = -1L;
         Long userID = -1L;
         try {
@@ -139,8 +141,58 @@ public class GatewayServiceImplementation implements GatewayService {
             request3.addHeader("content-type", "application/json");
             request3.setEntity(p);
             HttpResponse response3 = httpClient.execute(request3);
+
+            HttpPost request4 = new HttpPost(usersServiceUrl + "/users/"+userID+"/buy");
+            httpClient.execute(request4);
+
+            HttpPost request5 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/buy");
+            httpClient.execute(request5);
         }
         else
             System.out.println("No user or song");
+    }
+
+    @Override
+    public void addUser(@RequestBody String user) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        StringEntity p = new StringEntity(user);
+        HttpPost request = new HttpPost(usersServiceUrl + "/users");
+        request.addHeader("content-type", "application/json");
+        request.setEntity(p);
+        HttpResponse response = httpClient.execute(request);
+    }
+
+    @Override
+    public void addRatingForSong(Long userID, Long songID, int rate) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        String res = "";
+
+        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/check?user_id=" + userID + "&song_id=" + songID);
+        HttpResponse response = httpClient.execute(request);
+        Long p_id = 0L;
+        try {
+            JSONObject p = new JSONObject(EntityUtils.toString(response.getEntity()));
+            p_id = p.getLong("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        HttpPost request2 = new HttpPost(purchasesServiceUrl + "/purchases/"+p_id+"/rate&rating=" + rate);
+
+        HttpPost request3 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/rate&rating=" + rate);
+
+        httpClient.execute(request2);
+        httpClient.execute(request3);
+    }
+
+
+    @Override
+    public void addSong(@RequestBody String song) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        StringEntity p = new StringEntity(song);
+        HttpPost request = new HttpPost(songsServiceUrl + "/songs");
+        request.addHeader("content-type", "application/json");
+        request.setEntity(p);
+        HttpResponse response = httpClient.execute(request);
     }
 }

@@ -47,18 +47,16 @@ public class SongsServiceController {
     }
 
     // Оценка песни
-    @PostMapping(value = "songs/{id}/rate/{rating}")
-    public void setRating(@PathVariable Long id, @PathVariable String rating) throws SongNotFoundException {
-
-        double rate = Double.parseDouble(rating);
+    @PostMapping(value = "/songs/{id}/rate")
+    public void setRating(@PathVariable Long id, @RequestParam(value = "rating") int rate) throws SongNotFoundException {
+        logger.info("[POST] /songs/" + id + "/rate, rating:" + rate);
         songsService.setRating(id, rate);
-        logger.info("[POST] /songs/" + id + "/rate/" + rate);
     }
 
     // Покупка песни
     @PostMapping(value = "/songs/{id}/buy")
     public void buySong(@PathVariable Long id) throws SongNotFoundException {
-        songsService.incBuyNum(id);
         logger.info("[POST] /songs/" + id + "/buy");
+        songsService.incBuyNum(id);
     }
 }

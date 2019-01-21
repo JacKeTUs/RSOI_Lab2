@@ -11,27 +11,33 @@ import java.io.IOException;
 
 public interface GatewayService {
 
+    // Просмотреть все песни
+    String getSongs() throws IOException;
+
+    // Просмотреть одну песню
+    String getSongByID(@PathVariable Long songID) throws IOException;
+
     // Посмотреть информацию о пользователе
     String getUserById(Long userId) throws IOException;
 
     // Посмотреть все песни пользователя (все его покупки)
     String getSongsByUser(@PathVariable Long userId) throws IOException;
 
-    // Просмотреть все песни
-    String getSongs() throws IOException;
+    // Посмотреть песню пользователя (рейтинг)
+    String getUserSong(@PathVariable Long userId, @PathVariable Long songId) throws IOException;
 
-    // Просмотреть одну песню
-    String getSongByID(@PathVariable Long songID) throws IOException;;
+    // Посмотреть информацию о покупке
+    String getPurchase(@PathVariable Long ID) throws IOException;
+
+    // Покупка песни
+    void purchaseSong(@RequestBody String purchase) throws IOException;
+
+    // Добавить пользователя
+    void addUser(@RequestBody String user) throws IOException;
+
+    // Оценка песни
+    void addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException;
 
     // Добавить песню
     void addSong(@RequestBody String song) throws IOException;
-
-    // Добавить рейтинга песне
-    void addRatingForSong(@PathVariable Long songID, @RequestParam(value = "rating") double rate) throws IOException;
-
-    // Посмотреть все покупки песни
-    void getSongPurchases(@PathVariable Long songID) throws IOException;
-
-    // Добавить песню пользователю
-    void purchaseSong(@RequestBody String purchase) throws IOException;
 }

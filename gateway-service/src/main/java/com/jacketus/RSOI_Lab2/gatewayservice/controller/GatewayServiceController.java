@@ -23,24 +23,10 @@ public class GatewayServiceController {
         this.gatewayService = gatewayService;
     }
 
-    // Посмотреть информацию о пользователе
-    @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getUserById(@PathVariable Long userId) throws IOException {
-        logger.info("[GET] /users/" +userId);
-        return gatewayService.getUserById(userId);
-    }
-
-    // Посмотреть все песни пользователя (все его покупки)
-    @GetMapping(path = "/users/{userId}/songs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getSongsByUser(@PathVariable Long userId) throws IOException, JSONException {
-        logger.info("[GET] /users/" + userId + "/songs");
-        return gatewayService.getSongsByUser(userId);
-    }
-
     // Посмотреть список песен
     @GetMapping(path = "/songs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getSongs() throws IOException, JSONException {
-        logger.info("[GET] /songs");
+    public String getSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) throws IOException, JSONException {
+        logger.info("[GET] /songs, page: " + page + ", size: " + size);
         return gatewayService.getSongs();
     }
 
@@ -51,32 +37,66 @@ public class GatewayServiceController {
         return gatewayService.getSongByID(songID);
     }
 
-    // Добавить песню
-    @PostMapping(value = "/songs/add")
-    public void addSong(@RequestBody String song) throws IOException {
-        logger.info("[POST] /songs/add ", "song: ", song);
-        gatewayService.addSong(song);
+    // Посмотреть информацию о пользователе
+    @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getUserById(@PathVariable Long userId) throws IOException {
+        logger.info("[GET] /users/" +userId);
+        return gatewayService.getUserById(userId);
+    }
+
+    // Посмотреть все песни пользователя (все его покупки)
+    @GetMapping(path = "/users/{userId}/songs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getSongsByUser(@PathVariable Long userId, @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) throws IOException, JSONException {
+        logger.info("[GET] /users/" + userId + "/songs, page: " + page + ", size: " + size);
+        return gatewayService.getSongsByUser(userId);
+    }
+
+    // Посмотреть песню пользователя
+    @GetMapping(path = "/users/{userId}/songs/{songId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getSongsByUser(@PathVariable Long userId, @PathVariable Long songId) throws IOException, JSONException {
+        logger.info("[GET] /users/" + userId + "/songs/" + songId);
+        return gatewayService.getUserSong(userId, songId);
+    }
+
+    // Посмотреть информацию о покупке
+    @GetMapping(value = "/purchases/{purchaseID}")
+    public void getSongPurchases(@PathVariable Long purchaseID) throws IOException {
+        logger.info("[GET] /purchases/" + purchaseID);
+        gatewayService.getPurchase(purchaseID);
+    }
+
+    // Покупка песни
+    @PostMapping(value = "/purchase")
+    public void purchaseSong(@RequestBody String purchase) throws IOException {
+        logger.info("[POST] /purchase, purchase: " + purchase);
+        gatewayService.purchaseSong(purchase);
+    }
+
+    // Добавить пользователя
+    @PostMapping(value = "/users")
+    public void addUser(@RequestBody String user) throws IOException {
+        logger.info("[POST] /users ", "user: ", user);
+        gatewayService.addUser(user);
     }
 
     // Добавить рейтинг песне
-    @PostMapping(value = "/songs/{songID}/rate")
-    public void addRatingForSong(@PathVariable Long songID, @RequestParam(value = "rating") double rate) throws IOException {
-        logger.info("[POST] /songs/{songID}/rate ", "songID: ", songID, " rating: ", rate);
-        gatewayService.addRatingForSong(songID, rate);
+    @PostMapping(value = "/users/{userID}/songs/{songID}/rate")
+    public void addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException {
+        logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: ", rate);
+        gatewayService.addRatingForSong(userID, songID, rate);
     }
 
-    // Посмотреть все покупки песни
-    @GetMapping(value = "/purchases/songs/{songID}")
-    public void getSongPurchases(@PathVariable Long songID) throws IOException {
-        gatewayService.getSongPurchases(songID);
-        logger.info("[GET] /purchases/songs/ ", + songID);
+    // Добавить песню
+    @PostMapping(value = "/songs")
+    public void addSong(@RequestBody String song) throws IOException {
+        logger.info("[POST] /songs ", "song: ", song);
+        gatewayService.addSong(song);
     }
 
-    // Добавить песню пользователю
-    @PostMapping(value = "/purchase")
-    public void createReview(@RequestBody String purchase) throws IOException {
-        logger.info("[POST] /purchase ");
-        gatewayService.purchaseSong(purchase);
-    }
+
+
+
+
+
 
 }
