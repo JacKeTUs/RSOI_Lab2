@@ -61,5 +61,6 @@ public class PurchasesServiceImplementation implements PurchasesService{
         Purchase purchase = purchasesRepository.findById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
         purchase.setRating(rating);
+        purchasesRepository.save(purchase);
     }
 }

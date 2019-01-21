@@ -33,8 +33,8 @@ public class SongsServiceImplementation implements SongsService {
     }
 
     @Override
-    public void createSong(Song song) {
-        songsRepository.save(song);
+    public Song createSong(Song song) {
+        return songsRepository.save(song);
     }
 
     @Override

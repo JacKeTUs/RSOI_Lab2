@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SongsService {
     List<Song> getAllSongs();
-    void createSong(Song song);
+    Song createSong(Song song);
     Song getSongByID(Long id) throws SongNotFoundException;
     void setRating(Long id, double rating) throws SongNotFoundException;
     double getRating(Long id) throws SongNotFoundException;
