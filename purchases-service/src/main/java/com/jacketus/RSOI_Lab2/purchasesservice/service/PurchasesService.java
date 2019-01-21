@@ -9,9 +9,9 @@ public interface PurchasesService {
     Purchase findPurchaseById(Long id) throws PurchaseNotFoundException;
     Purchase findPurchaseByUserID(Long userID) throws PurchaseNotFoundException;
     Purchase findPurchaseBySongID(Long songID) throws PurchaseNotFoundException;
-    boolean checkPurchaseBySongForUser(Long userID, Long songID);
+    Purchase checkPurchaseBySongForUser(Long userID, Long songID) throws PurchaseNotFoundException;
     List<Purchase> getAllPurchases();
-    void createPurchase(Purchase purchase);
-    //void addPurchase(Long songID, Long userID);
+    Purchase createPurchase(Purchase purchase);
+    void rate(Long id, int rating) throws PurchaseNotFoundException;
 }
 

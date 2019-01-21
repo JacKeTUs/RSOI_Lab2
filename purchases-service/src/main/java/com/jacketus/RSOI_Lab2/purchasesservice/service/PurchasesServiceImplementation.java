@@ -23,7 +23,7 @@ public class PurchasesServiceImplementation implements PurchasesService{
     }
 
     @Override
-    public Purchase findPurchaseById(Long id) throws PurchaseNotFoundException{
+    public Purchase findPurchaseById(Long id) throws PurchaseNotFoundException {
         return purchasesRepository.findById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
     }
@@ -37,7 +37,7 @@ public class PurchasesServiceImplementation implements PurchasesService{
     }
 
     @Override
-    public Purchase findPurchaseBySongID(Long songID) throws PurchaseNotFoundException{
+    public Purchase findPurchaseBySongID(Long songID) throws PurchaseNotFoundException {
         Purchase purchase = purchasesRepository.findBySongID(songID);
         if (purchase == null)
             throw new PurchaseNotFoundException(songID);
@@ -45,16 +45,21 @@ public class PurchasesServiceImplementation implements PurchasesService{
     }
 
     @Override
-    public boolean checkPurchaseBySongForUser(Long userID, Long songID) {
+    public Purchase checkPurchaseBySongForUser(Long userID, Long songID) throws PurchaseNotFoundException {
         Purchase purchase = purchasesRepository.findBySongIDAndUserID(songID, userID);
-        if (purchase == null)
-            return false;
-        return true;
+        return purchase;
     }
 
     @Override
-    public void createPurchase(Purchase purchase) {
-        System.out.println(purchase.toString());
-        purchasesRepository.save(purchase);
+    public Purchase createPurchase(Purchase purchase) {
+        System.out.println("CREATE: " + purchase.toString());
+        return purchasesRepository.save(purchase);
+    }
+
+    @Override
+    public void rate(Long id, int rating) throws PurchaseNotFoundException {
+        Purchase purchase = purchasesRepository.findById(id)
+                .orElseThrow(() -> new PurchaseNotFoundException(id));
+        purchase.setRating(rating);
     }
 }

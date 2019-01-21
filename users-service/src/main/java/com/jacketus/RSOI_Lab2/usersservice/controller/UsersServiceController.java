@@ -23,27 +23,31 @@ public class UsersServiceController {
         logger = LoggerFactory.getLogger(UsersServiceController.class);
     }
 
+     // Добавление пользователя
     @PostMapping(value = "/users")
     public void createUser(@RequestBody User user){
-        usersService.createUser(user);
         logger.info("[POST] /users", user);
+        usersService.createUser(user);
     }
 
+    // Получение списка пользователей
     @GetMapping(value = "/users")
     public List<User> getAllUsers(){
         logger.info("[GET] /users");
         return usersService.getAllUsers();
     }
 
+    // Получение информации о пользователе
     @GetMapping(value = "/users/{id}")
     public User getUserById(@PathVariable Long id) throws UserNotFoundException {
         logger.info("[GET] /users/" + id);
         return usersService.findUserById(id);
     }
 
-    @GetMapping(value = "/users/find")
-    public User getUserByLogin(@RequestParam(value = "login") String login) throws UserNotFoundException {
-        logger.info("[GET] /users/find ", login);
-        return usersService.findUserByLogin(login);
+    // Покупка пользователем песни
+    @PostMapping(value = "/users/{id}/buy")
+    public void userBuySong(@PathVariable Long id) throws UserNotFoundException {
+        logger.info("[POST] /users/" + id + "/buy");
+        usersService.incBuyNum(id);
     }
 }

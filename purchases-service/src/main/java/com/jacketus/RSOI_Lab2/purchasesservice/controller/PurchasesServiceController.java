@@ -23,35 +23,45 @@ public class PurchasesServiceController {
         logger = LoggerFactory.getLogger(PurchasesServiceController.class);
     }
 
-
+    // Покупка.
     @PostMapping(value = "/purchases")
     public void addPurchase(@RequestBody Purchase purchase) {
         logger.info("[POST] /purchases");
         purchasesService.createPurchase(purchase);
     }
 
-    @GetMapping(value = "/purchases")
-    public List<Purchase> getAllPurchases(){
-        logger.info("[GET] /purchases");
-        return purchasesService.getAllPurchases();
-    }
-
+    // Получение информации об оплате
     @GetMapping(value = "/purchases/{id}")
     public Purchase getPurchaseById(@PathVariable Long id) throws PurchaseNotFoundException {
         logger.info("[GET] /purchases/" + id);
         return purchasesService.findPurchaseById(id);
     }
 
+    // Все купленные песни пользователем
     @GetMapping(value = "/purchases/find")
     public Purchase getPurchaseByUserID(@RequestParam(value = "user_id") Long userID) throws PurchaseNotFoundException {
         logger.info("[GET] /purchases/find ", userID);
         return purchasesService.findPurchaseByUserID(userID);
     }
 
+    // Поиск лицензии на песню на пользователя.
     @GetMapping(value = "/purchases/check")
-    public boolean getPurchaseByUserID(@RequestParam(value = "user_id") Long userID, @RequestParam(value = "song_id") Long songID ) throws PurchaseNotFoundException {
-        logger.info("[GET] /purchases/find ", userID);
-        return purchasesService.checkPurchaseBySongForUser(userID, songID);
+    public Purchase checkPurchaseByUserID(@RequestParam(value = "user_id") Long userID, @RequestParam(value = "song_id") Long songID ) throws PurchaseNotFoundException {
+        logger.info("[GET] /purchases/check ", userID);
+        Purchase p = null;
+        try {
+            p = purchasesService.checkPurchaseBySongForUser(userID, songID);
+        } catch (PurchaseNotFoundException e) {
+            e.printStackTrace();
+        }
+        return p;
+    }
+
+    // Оценка.
+    @PostMapping(value = "/purchases/{id}/rate")
+    public void addPurchase(@PathVariable Long id, @RequestParam(value = "rating") int rating) throws PurchaseNotFoundException {
+        logger.info("[POST] /purchases/" + id + "/rate, rating: " + rating);
+        purchasesService.rate(id, rating);
     }
 
 }

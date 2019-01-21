@@ -13,30 +13,41 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "UserID")
-    private Long userID;
+    @Column(name = "user_id")
+    private Long user_id;
 
-    @Column(name = "SongID")
-    private Long songID;
+    @Column(name = "song_id")
+    private Long song_id;
+
+    @Column(name = "rating")
+    private int rating;
 
     public Long getId() {
         return id;
     }
 
     public Long getUserID() {
-        return userID;
+        return user_id;
     }
 
     public void setUserID(Long userID) {
-        this.userID = userID;
+        this.user_id = userID;
     }
 
     public Long getSongID() {
-        return songID;
+        return song_id;
     }
 
     public void setSongID(Long songID) {
-        this.songID = songID;
+        this.song_id = songID;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     @Override
@@ -48,9 +59,10 @@ public class Purchase {
         Purchase purchase = (Purchase) o;
 
         return new EqualsBuilder()
-                .append(songID, purchase.songID)
-                .append(userID, purchase.userID)
                 .append(id, purchase.id)
+                .append(song_id, purchase.song_id)
+                .append(user_id, purchase.user_id)
+                .append(rating, purchase.rating)
                 .isEquals();
     }
 
@@ -58,8 +70,9 @@ public class Purchase {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
-                .append(userID)
-                .append(songID)
+                .append(user_id)
+                .append(song_id)
+                .append(rating)
                 .toHashCode();
     }
 
@@ -67,8 +80,9 @@ public class Purchase {
     public String toString() {
         return "Purchase{" +
                 "id=" + id + ", " +
-                "userID='" + userID + '\'' + ", " +
-                "songID='" + songID + '\'' +
+                "user_id='" + user_id + '\'' + ", " +
+                "song_id='" + song_id + '\'' + ", " +
+                "rating='" + rating + '\'' +
                 '}';
     }
 }

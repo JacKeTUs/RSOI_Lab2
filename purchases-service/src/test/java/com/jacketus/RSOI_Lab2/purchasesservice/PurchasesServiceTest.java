@@ -16,6 +16,8 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -51,6 +53,11 @@ public class PurchasesServiceTest {
 
         given(purchasesRepository.save(purchase)).willReturn(purchase);
         assertThat(purchasesRepository.save(purchase), is(purchase));
+        Purchase saved = purchasesRepository.save(purchase);
+
+        Long s = saved.getSongID();
+        assertEquals(Optional.of(5L), Optional.ofNullable(s));
+        assertEquals(Optional.of(1L), Optional.ofNullable(saved.getUserID()));
     }
 
     @Test
@@ -89,8 +96,85 @@ public class PurchasesServiceTest {
         given(purchasesRepository.findBySongIDAndUserID(5L,1L)).willReturn(purchase);
 
         purchasesService.createPurchase(purchase);
-        assertEquals(purchasesService.checkPurchaseBySongForUser(1L, 5L), true);
-        assertEquals(purchasesService.checkPurchaseBySongForUser(1L, 6L), false);
+
+        if (purchasesService.checkPurchaseBySongForUser(1L, 5L) == null)
+            fail();
+        if (purchasesService.checkPurchaseBySongForUser(1L, 6L) != null)
+            fail();
+
+    }
+
+    @Test
+    public void shouldRatePurchase() throws PurchaseNotFoundException {
+        Purchase purchase = new Purchase();
+        purchase.setSongID(5L);
+        purchase.setUserID(1L);
+
+        given(purchasesRepository.save(purchase)).willReturn(purchase);
+        given(purchasesRepository.findById(purchase.getId())).willReturn(Optional.of(purchase));
+
+        Purchase saved = purchasesService.createPurchase(purchase);
+        purchasesService.rate(saved.getId(), 4);
+        int rate = purchasesService.findPurchaseById(saved.getId()).getRating();
+
+        assertEquals(4, rate);
+    }
+
+    @Test
+    public void shouldHash(){
+        Purchase purchase = new Purchase();
+        purchase.setSongID(5L);
+        purchase.setUserID(1L);
+
+        try {
+            given(purchasesRepository.save(purchase)).willReturn(purchase);
+            given(purchasesRepository.findById(purchase.getId())).willReturn(Optional.of(purchase));
+            Purchase saved = purchasesService.createPurchase(purchase);
+
+            assertNotNull(saved.hashCode());
+        }
+        catch (Exception ex){
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldToString(){
+        Purchase purchase = new Purchase();
+        purchase.setSongID(5L);
+        purchase.setUserID(1L);
+        String s = "Purchase{id=null, user_id='1', song_id='5', rating='0'}";
+
+        try {
+            given(purchasesRepository.save(purchase)).willReturn(purchase);
+            given(purchasesRepository.findById(purchase.getId())).willReturn(Optional.of(purchase));
+            Purchase saved = purchasesService.createPurchase(purchase);
+
+            System.out.println(saved.toString());
+            assertEquals(s, saved.toString());
+        }
+        catch (Exception ex){
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldEquals(){
+        Purchase purchase = new Purchase();
+        purchase.setSongID(5L);
+        purchase.setUserID(1L);
+
+        try {
+            given(purchasesRepository.save(purchase)).willReturn(purchase);
+            given(purchasesRepository.findById(purchase.getId())).willReturn(Optional.of(purchase));
+            Purchase saved = purchasesService.createPurchase(purchase);
+
+            boolean eq = saved.equals(purchase);
+            assertEquals(true, eq);
+        }
+        catch (Exception ex){
+            fail();
+        }
     }
 
 }
