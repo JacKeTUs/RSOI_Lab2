@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +29,10 @@ public class SongsServiceController {
 
     // Получение списка песен
     @GetMapping(value = "/songs")
-    public List<Song> getAllSongs(){
-        logger.info("[GET] /songs ");
-        return songsService.getAllSongs();
+    public Page<Song> getAllSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size){
+        logger.info("[GET] /songs page=" + page + " size=" + size);
+        PageRequest p = PageRequest.of(page, size);
+        return songsService.getAllSongs(p);
     }
 
     // Получение информации об одной песне

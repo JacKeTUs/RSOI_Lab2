@@ -11,9 +11,11 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.awt.print.Pageable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,9 +35,9 @@ public class GatewayServiceImplementation implements GatewayService {
     final private String purchasesServiceUrl = "http://localhost:8072";
 
     @Override
-    public String getSongs() throws IOException {
+    public String getSongs(PageRequest p) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(songsServiceUrl + "/songs");
+        HttpGet request = new HttpGet(songsServiceUrl + "/songs?page="+p.getPageNumber() + "&size=" + p.getPageSize());
         HttpResponse response = httpClient.execute(request);
 
         return EntityUtils.toString(response.getEntity());

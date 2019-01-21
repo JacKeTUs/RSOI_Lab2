@@ -1,15 +1,13 @@
 package com.jacketus.RSOI_Lab2.songsservice.service;
 
-import com.jacketus.RSOI_Lab2.songsservice.*;
-
 import com.jacketus.RSOI_Lab2.songsservice.entity.Song;
 import com.jacketus.RSOI_Lab2.songsservice.exception.SongNotFoundException;
 import com.jacketus.RSOI_Lab2.songsservice.repository.SongsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -21,8 +19,8 @@ public class SongsServiceImplementation implements SongsService {
     }
 
     @Override
-    public List<Song> getAllSongs() {
-        return songsRepository.findAll();
+    public Page<Song> getAllSongs(PageRequest p) {
+        return songsRepository.findAll(p);
     }
 
     @Override

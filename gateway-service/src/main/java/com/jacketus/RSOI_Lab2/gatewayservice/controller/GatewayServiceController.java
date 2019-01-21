@@ -6,8 +6,11 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.print.Pageable;
 import java.io.IOException;
 
 @RestController
@@ -27,7 +30,11 @@ public class GatewayServiceController {
     @GetMapping(path = "/songs", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) throws IOException, JSONException {
         logger.info("[GET] /songs, page: " + page + ", size: " + size);
-        return gatewayService.getSongs();
+        PageRequest p;
+        p = PageRequest.of(page, size);
+
+
+        return gatewayService.getSongs(p);
     }
 
     // Посмотреть одну песню

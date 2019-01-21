@@ -8,14 +8,15 @@ import com.jacketus.RSOI_Lab2.songsservice.service.SongsServiceImplementation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -60,15 +61,21 @@ public class SongsServiceTest {
     @Test
     public void shouldReturnSongsList(){
         List<Song> songs = new ArrayList<>();
+
         Song song = new Song();
         song.setArtist("Artist");
         song.setName("Song");
         song.setLink("Link");
         songs.add(song);
+        songs.add(song);
+        songs.add(song);
 
-        given(songsRepository.findAll()).willReturn(songs);
-        List<Song> songsReturned = songsService.getAllSongs();
-        assertThat(songsReturned, is(songs));
+        Page<Song> songs_p = new PageImpl<Song>(songs);
+
+        given(songsRepository.findAll(PageRequest.of(1, 1))).willReturn(songs_p);
+        Page<Song> songsReturned = songsService.getAllSongs(PageRequest.of(1, 1));
+
+        assertThat(songsReturned, is(songs_p));
     }
 
     @Test
