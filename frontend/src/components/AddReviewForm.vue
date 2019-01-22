@@ -41,7 +41,6 @@
 
 <script>
     import axios from 'axios';
-    import VueStars from './VueStars';
     export default {
         name:"AddReviewForm",
         components: {VueStars},

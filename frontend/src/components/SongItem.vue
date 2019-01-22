@@ -5,7 +5,6 @@
                 <img src="../assets/song.svg" width="120" alt="Song cover" style="background: #f5f5f5;">
             </b-col>
             <b-col class="card-block px-2" style="margin-left: 20px; text-align: left">
-                <h4 class="card-title"><strong>{{song.name}}</strong></h4>
                 <p class="card-text">
                     <strong>Автор:</strong> {{song.artist}}<br/>
                     <strong>Название:</strong> {{song.name}}<br/>
@@ -22,7 +21,7 @@
     export default{
         name: "SongItem",
         components: {truncate},
-        data(){
+        data() {
             return{
                 config: {
                     id: Number(this.song.id),

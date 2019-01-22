@@ -1,13 +1,18 @@
 <template>
     <div class="users" >
-        <h1>Пользователи</h1>
+        <h1>Профиль</h1>
         <b-button
-                v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" style="margin: 10px">Добавить пользователя</b-button>
+            v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" style="margin: 10px">Добавить пользователя</b-button>
         <b-collapse id="collapse1" v-model="showCollapse" class="mt-2">
             <AddUserForm style="width: 50%; margin: auto"
                          v-on:hide-add-user-form="hideAddUserForm"
                          v-on:add-user="addUser"/>
         </b-collapse>
+
+
+        <div class="userItem" v-for="user">
+            <UserItem v-bind:user="user"/>
+        </div>
     </div>
 </template>
 
@@ -20,30 +25,25 @@
         components: {UserItem, AddUserForm},
         data(){
             return{
+                userID: 1,
                 users:[],
+                user:[],
                 showCollapse: false
             }
         },
         methods: {
-            deleteUser(id){
-                axios.delete(`/api/users/${id}`)
-                    .then()
-                    .catch(err => console.log(err));
-                setTimeout(() => {this.updateData()}, 500);
-            },
             addUser(user){
-                axios.post('api/users', user)
+                axios.post('api/users', this.user)
                     .then(this.hideAddUserForm)
                     .catch(err => console.log(err));
                 setTimeout(() => {this.updateData()}, 500);
             },
-            updateData(){
-                axios.get('/api/users')
-                    .then(res => this.users = res.data)
+            updateData() {
+                axios.get('api/users/' + this.userID)
+                    .then(res => {
+                        this.user=res.data.content;
+                    })
                     .catch(err => console.log(err));
-            },
-            hideAddUserForm(){
-                this.showCollapse = false;
             }
         },
         created() {

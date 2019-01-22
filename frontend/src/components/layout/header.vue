@@ -7,7 +7,7 @@
         </h1>
         <div class="header-right">
             <router-link to="/songs">Список песен</router-link>
-            <router-link to="/users">Пользователи</router-link>
+            <router-link to="/user">Мой профиль</router-link>
         </div>
     </div>
 </template>

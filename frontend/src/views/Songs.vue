@@ -51,7 +51,17 @@
                     console.log("-----------");
                     console.log(this.songs);})
                 .catch(err => console.log(err))
-
+        },
+        updateData() {
+            axios.get(this.pageLink)
+                .then(res => {
+                    this.pagesNum = res.data.totalPages;
+                    this.songs.splice(0, this.songs.length);
+                    this.songs.push(...  res.data.content);
+                    console.log(res.data.content);
+                    console.log("-----------");
+                    console.log(this.songs);})
+                .catch(err => console.log(err))
         }
     }
 
