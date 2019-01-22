@@ -18,7 +18,7 @@ public class UsersServiceController {
     private Logger logger;
 
     @Autowired
-    UsersServiceController(UsersService usersService){
+    public UsersServiceController(UsersService usersService){
         this.usersService = usersService;
         logger = LoggerFactory.getLogger(UsersServiceController.class);
     }
