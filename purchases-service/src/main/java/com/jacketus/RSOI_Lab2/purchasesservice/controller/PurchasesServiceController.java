@@ -18,7 +18,7 @@ public class PurchasesServiceController {
     private Logger logger;
 
     @Autowired
-    PurchasesServiceController(PurchasesService purchasesService){
+    public PurchasesServiceController(PurchasesService purchasesService){
         this.purchasesService = purchasesService;
         logger = LoggerFactory.getLogger(PurchasesServiceController.class);
     }
