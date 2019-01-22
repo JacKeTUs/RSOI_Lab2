@@ -33,6 +33,7 @@
 		<module>users-service</module>
 		<module>purchases-service</module>
 		<module>gateway-service</module>
+		<module>frontend</module>
 	</modules>
 
 </project>

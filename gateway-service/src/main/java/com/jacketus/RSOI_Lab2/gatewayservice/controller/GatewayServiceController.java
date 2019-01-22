@@ -32,8 +32,6 @@ public class GatewayServiceController {
         logger.info("[GET] /songs, page: " + page + ", size: " + size);
         PageRequest p;
         p = PageRequest.of(page, size);
-
-
         return gatewayService.getSongs(p);
     }
 
