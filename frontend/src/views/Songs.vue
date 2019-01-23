@@ -2,12 +2,15 @@
     <div class="songs">
         <h1>Песни</h1>
 
+
         <b-pagination size="md"
                       v-model="currentPage"
-                      :total-rows=pagesNum
+                      :number-of-pages=2
                       :per-page=5
+                      @change="pageChange"
                       style="margin: auto; padding-top: 20px">
         </b-pagination>
+
 
 
         <div class="songs-list" v-bind:key="song.id" v-for="song in songs">
@@ -27,7 +30,7 @@
         computed:{
             pageLink(){
                 console.log(this.currentPage);
-                return this.linkGen(this.currentPage);
+                return this.linkGen(this.currentPage-1);
             }
         },
         methods: {
@@ -37,20 +40,26 @@
             updateData() {
                 axios.get(this.pageLink)
                     .then(res => {
+                        console.log(res.data);
                         this.pagesNum = res.data.totalPages;
                         this.songs.splice(0, this.songs.length);
                         this.songs.push(...  res.data.content);
-                        console.log(res.data.content);
-                        console.log("-----------");
-                        console.log(this.songs);})
+                        console.log(this.songs);
+                        this.$forceUpdate();
+                    })
                     .catch(err => console.log(err))
+            },
+            pageChange(page){
+                console.log(page);
+                this.currentPage = page;
+                this.updateData();
             }
         },
         data(){
             return{
                 songs: [],
                 currentPage: 1,
-                pagesNum: 3,
+                pagesNum: 0,
                 pageSize: 5
             }
         },
