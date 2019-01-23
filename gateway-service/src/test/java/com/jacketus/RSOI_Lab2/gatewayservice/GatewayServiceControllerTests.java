@@ -1,4 +1,4 @@
-package com.jacketus.RSOI_Lab2.songsservice;
+package com.jacketus.RSOI_Lab2.gatewayservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SongsServiceApplicationTests {
+public class GatewayServiceControllerTests {
 
 	@Test
 	public void contextLoads() {

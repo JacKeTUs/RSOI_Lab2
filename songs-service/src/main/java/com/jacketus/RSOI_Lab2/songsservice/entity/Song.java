@@ -27,6 +27,9 @@ public class Song {
     @Column(name = "RATE_NUMS", columnDefinition = "integer default 0")
     private int rate_nums;
 
+    @Column(name = "BUY_NUMS", columnDefinition = "integer default 0")
+    private int buy_nums;
+
     public Long getId() {
         return id;
     }
@@ -67,6 +70,15 @@ public class Song {
         return this.rate_nums;
     }
 
+
+    public int getBuy_nums() {
+        return buy_nums;
+    }
+
+    public void setBuy_nums(int buy_nums) {
+        this.buy_nums = buy_nums;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,6 +94,7 @@ public class Song {
                 .append(link, s.link)
                 .append(rating, s.rating)
                 .append(rate_nums, s.rate_nums)
+                .append(buy_nums, s.buy_nums)
                 .isEquals();
     }
 
@@ -94,6 +107,7 @@ public class Song {
                 .append(link)
                 .append(rating)
                 .append(rate_nums)
+                .append(buy_nums)
                 .toHashCode();
     }
 
@@ -105,7 +119,8 @@ public class Song {
                         "name='" + name + '\'' + ", " +
                         "link=" + link + ", " +
                         "rating=" + rating + ", " +
-                        "rate_nums=" + rate_nums +
+                        "rate_nums=" + rate_nums + ", " +
+                        "buy_nums=" + buy_nums +
                     '}';
     }
 }

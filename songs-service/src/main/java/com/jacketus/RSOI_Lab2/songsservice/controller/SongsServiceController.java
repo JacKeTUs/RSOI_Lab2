@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,21 +27,39 @@ public class SongsServiceController {
         logger  = LoggerFactory.getLogger(SongsServiceImplementation.class);
     }
 
+    // Получение списка песен
+    @GetMapping(value = "/songs")
+    public Page<Song> getAllSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size){
+        logger.info("[GET] /songs page=" + page + " size=" + size);
+        PageRequest p = PageRequest.of(page, size);
+        return songsService.getAllSongs(p);
+    }
+
+    // Получение информации об одной песне
+    @GetMapping(value = "/songs/{id}")
+    public Song getSongByID(@PathVariable Long id) throws SongNotFoundException {
+        logger.info("[GET] /songs/ " + id);
+        return songsService.getSongByID(id);
+    }
+
+    // Добавление песни на сайт
     @PostMapping(value = "/songs")
     public void createSong(@RequestBody Song song){
-        songsService.createSong(song);
         logger.info("[POST] /songs ", song);
+        songsService.createSong(song);
     }
 
-    @GetMapping(value = "/songs")
-    public List<Song> getAllSongs(){
-        logger.info("[GET] /songs ");
-        return songsService.getAllSongs();
+    // Оценка песни
+    @PostMapping(value = "/songs/{id}/rate")
+    public void setRating(@PathVariable Long id, @RequestParam(value = "rating") int rate) throws SongNotFoundException {
+        logger.info("[POST] /songs/" + id + "/rate, rating:" + rate);
+        songsService.setRating(id, rate);
     }
 
-    @PostMapping(value = "songs/{id}/setRating/{rating}")
-    public void setRating(@PathVariable Long id, @PathVariable double rating) throws SongNotFoundException {
-        songsService.setRating(id, rating);
-        logger.info("[POST] /songs/" + id + "/setRating/" + rating);
+    // Покупка песни
+    @PostMapping(value = "/songs/{id}/buy")
+    public void buySong(@PathVariable Long id) throws SongNotFoundException {
+        logger.info("[POST] /songs/" + id + "/buy");
+        songsService.incBuyNum(id);
     }
 }

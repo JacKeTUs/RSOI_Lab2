@@ -1,14 +1,13 @@
 package com.jacketus.RSOI_Lab2.songsservice.service;
 
-import com.jacketus.RSOI_Lab2.songsservice.*;
-
 import com.jacketus.RSOI_Lab2.songsservice.entity.Song;
 import com.jacketus.RSOI_Lab2.songsservice.exception.SongNotFoundException;
 import com.jacketus.RSOI_Lab2.songsservice.repository.SongsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -20,13 +19,20 @@ public class SongsServiceImplementation implements SongsService {
     }
 
     @Override
-    public List<Song> getAllSongs () {
-        return songsRepository.findAll();
+    public Page<Song> getAllSongs(PageRequest p) {
+        return songsRepository.findAll(p);
     }
 
     @Override
-    public void createSong(Song song) {
-        songsRepository.save(song);
+    public Song getSongByID (Long id) throws SongNotFoundException {
+        Song song =  songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+        return song;
+    }
+
+    @Override
+    public Song createSong(Song song) {
+        return songsRepository.save(song);
     }
 
     @Override
@@ -48,9 +54,25 @@ public class SongsServiceImplementation implements SongsService {
     public double getRating(Long id) throws SongNotFoundException {
         Song song = songsRepository.findById(id)
                 .orElseThrow(() -> new SongNotFoundException(id));
-        double res = song.getRating();
-        songsRepository.save(song);
-        return res;
+        return song.getRating();
     }
+
+    @Override
+    public void incBuyNum(Long id) throws SongNotFoundException {
+        Song song = songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+
+        song.setBuy_nums(song.getBuy_nums() + 1);
+        songsRepository.save(song);
+    }
+
+    @Override
+    public int getBuyNum(Long id) throws SongNotFoundException {
+        Song song = songsRepository.findById(id)
+                .orElseThrow(() -> new SongNotFoundException(id));
+
+        return song.getBuy_nums();
+    }
+
 
 }
