@@ -13,6 +13,12 @@
         <div class="userItem" v-for="user">
             <UserItem v-bind:user="user"/>
         </div>
+
+        <h1>Песни пользователя</h1>
+        <div class="songs-list" v-bind:key="song.id" v-for="song in songs">
+            <SongItem  v-bind:song="song"/>
+        </div>
+
     </div>
 </template>
 
@@ -26,28 +32,50 @@
         data(){
             return{
                 userID: 1,
-                users:[],
-                user:[],
+                songs: [],
+                user: {},
                 showCollapse: false
             }
         },
         methods: {
-            addUser(user){
-                axios.post('api/users', this.user)
+            addUser(_user){
+
+                setTimeout(() => {this.updateData()}, 500);
+
+                axios.post('/api/users', _user)
                     .then(this.hideAddUserForm)
                     .catch(err => console.log(err));
-                setTimeout(() => {this.updateData()}, 500);
             },
             updateData() {
-                axios.get('api/users/' + this.userID)
+                axios.get('/api/users/' + this.userID)
                     .then(res => {
-                        this.user=res.data.content;
+                        this.user = Object.assign({}, this.user, res.data);
+                        console.log(this.user);
+                        this.$forceUpdate();
                     })
                     .catch(err => console.log(err));
+
+                axios.get("/api/users/" + this.userID + "/songs")
+                    .then(res => {
+                        console.log(res.data);
+                        this.songs.splice(0, this.songs.length);
+                        this.songs.push(res.data);
+                        console.log(this.songs);
+                        this.$forceUpdate();
+                    })
+                    .catch(err => console.log(err));
+
+            },
+            hideAddUserForm(){
+                this.showCollapse = false;
             }
         },
         created() {
             this.updateData();
+            this.$on('add-user', (user) => {
+                //this.user = user;
+                this.addUser(user);
+            })
         }
     }
 </script>

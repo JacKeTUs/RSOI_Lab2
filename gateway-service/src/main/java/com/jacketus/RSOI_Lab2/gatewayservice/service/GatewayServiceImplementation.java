@@ -63,7 +63,7 @@ public class GatewayServiceImplementation implements GatewayService {
 
     @Override
     public String getSongsByUser(Long userId) throws IOException {
-        String res = "";
+        String res = "", res2 = "";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(usersServiceUrl + "/users/"+userId);
         HttpResponse response1 = httpClient.execute(request);
@@ -72,9 +72,18 @@ public class GatewayServiceImplementation implements GatewayService {
         request = new HttpGet(purchasesServiceUrl + "/purchases/find/?user_id=" + userId);
         HttpResponse response2 = httpClient.execute(request);
 
-        res += "\n" + EntityUtils.toString(response2.getEntity());
+        res2 += EntityUtils.toString(response2.getEntity());
+        try {
+            JSONObject json1 = new JSONObject(res);
+            JSONObject json2 = new JSONObject(res2);
+            json1.put("songs", json2);
 
-        return res;
+            return json1.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     @Override

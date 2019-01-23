@@ -55,6 +55,7 @@
                 evt.preventDefault();
                 /* Reset our form values */
                 this.user.name = '';
+                this.user.lastName = '';
                 this.user.login = '';
 
                 this.$emit('hide-add-user-form');

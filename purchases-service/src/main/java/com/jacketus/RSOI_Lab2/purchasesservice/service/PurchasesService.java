@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface PurchasesService {
     Purchase findPurchaseById(Long id) throws PurchaseNotFoundException;
-    Purchase findPurchaseByUserID(Long userID) throws PurchaseNotFoundException;
-    Purchase findPurchaseBySongID(Long songID) throws PurchaseNotFoundException;
+    List<Purchase> findPurchaseByUserID(Long userID) throws PurchaseNotFoundException;
+    List<Purchase> findPurchaseBySongID(Long songID) throws PurchaseNotFoundException;
     Purchase checkPurchaseBySongForUser(Long userID, Long songID) throws PurchaseNotFoundException;
     List<Purchase> getAllPurchases();
     Purchase createPurchase(Purchase purchase);

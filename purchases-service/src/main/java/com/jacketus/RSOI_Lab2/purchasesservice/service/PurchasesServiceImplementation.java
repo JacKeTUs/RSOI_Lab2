@@ -29,16 +29,16 @@ public class PurchasesServiceImplementation implements PurchasesService{
     }
 
     @Override
-    public Purchase findPurchaseByUserID(Long userID) throws PurchaseNotFoundException{
-        Purchase purchase = purchasesRepository.findByUserID(userID);
+    public List<Purchase> findPurchaseByUserID(Long userID) throws PurchaseNotFoundException{
+        List<Purchase> purchase = purchasesRepository.getAllByUserID(userID);
         if (purchase == null)
             throw new PurchaseNotFoundException(userID);
         return purchase;
     }
 
     @Override
-    public Purchase findPurchaseBySongID(Long songID) throws PurchaseNotFoundException {
-        Purchase purchase = purchasesRepository.findBySongID(songID);
+    public List<Purchase> findPurchaseBySongID(Long songID) throws PurchaseNotFoundException {
+        List<Purchase> purchase = purchasesRepository.getAllBySongID(songID);
         if (purchase == null)
             throw new PurchaseNotFoundException(songID);
         return purchase;

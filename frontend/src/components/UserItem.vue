@@ -2,12 +2,13 @@
     <div class = "user-item shadow" style="margin-bottom: 10px">
         <b-card >
             <p class="card-text">
-                <strong>Имя:</strong> {{user.name}} {{user.lastName}}<br/>
-                <strong>Логин:</strong> {{user.login}}<br/>
-                <strong>Количество оценок:</strong> {{user.reviewsNum}}<br/>
+                <strong>Имя:</strong> {{ user.name }} {{ user.lastName }}<br/>
+                <strong>Логин:</strong> {{ user.login }}<br/>
+                <strong>Количество покупок:</strong> {{ user.buy_num }}<br/>
             </p>
 
         </b-card>
+
 
         <div class="songs-list" v-bind:key="song.id" v-for="song in songs">
             <SongItem  v-bind:song="song"/>
@@ -23,25 +24,28 @@
         props: ["user"],
         methods:{
             updateData() {
-                axios.get("/api/users/"+ this.user.id+"/songs")
+                axios.get("/api/users/"+ this.userID + "/songs")
                     .then(res => {
                         this.songs.splice(0, this.songs.length);
-                        this.songs.push(...  res.data.content);})
+                        this.songs.push(...  res.data.content);
+                        this.$forceUpdate();})
                     .catch(err => console.log(err));
 
 
-                axios.get('api/users/' + this.userID)
+                axios.get('/api/users/' + this.userID)
                     .then(res => {
-                        this.user=res.data.content;
+                        this.user = Object.assign({}, this.user, res.data.content);
+                        console.log(this.user);
+                        this.$forceUpdate();
                     })
                     .catch(err => console.log(err));
             },
         },
         data() {
             return {
-                userID: 1,
+                userID: 5,
                 songs: [],
-                user: user,
+                user: {}
             }
         },
         created() {

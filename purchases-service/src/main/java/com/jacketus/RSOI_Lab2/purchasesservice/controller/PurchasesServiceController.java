@@ -39,7 +39,7 @@ public class PurchasesServiceController {
 
     // Все купленные песни пользователем
     @GetMapping(value = "/purchases/find")
-    public Purchase getPurchaseByUserID(@RequestParam(value = "user_id") Long userID) throws PurchaseNotFoundException {
+    public List<Purchase> getPurchaseByUserID(@RequestParam(value = "user_id") Long userID) throws PurchaseNotFoundException {
         logger.info("[GET] /purchases/find ", userID);
         return purchasesService.findPurchaseByUserID(userID);
     }

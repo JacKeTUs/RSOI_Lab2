@@ -6,8 +6,8 @@
             </b-col>
             <b-col class="card-block px-2" style="margin-left: 20px; text-align: left">
                 <p class="card-text">
-                    <strong>Автор:</strong> {{song.artist}}<br/>
-                    <strong>Название:</strong> {{song.name}}<br/>
+                    <strong>Автор:</strong> {{ song.artist }}<br/>
+                    <strong>Название:</strong> {{ song.name }}<br/>
                 </p>
                 <router-link :to="'song/' + this.song.id" class="btn btn-primary shadowed-button" style="margin-top: 20px">Подробнее...</router-link>
             </b-col>
@@ -22,15 +22,8 @@
         name: "SongItem",
         components: {truncate},
         data() {
-            return{
-                config: {
-                    id: Number(this.song.id),
-                    artist: Number(this.song.artist),
-                    name: Number(this.song.name),
-                    rating: Number(this.song.rating),
-                    buy_num: Number(this.song.buy_num),
-                    rate_nums: Number(this.song.rate_nums),
-                }
+            return {
+                song: {}
             }
         },
         props: ["song"]

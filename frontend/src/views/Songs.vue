@@ -21,7 +21,9 @@
     import axios from 'axios';
     export default {
         name: "songs",
-        components:{SongItem},
+        components:{
+            SongItem
+        },
         computed:{
             pageLink(){
                 console.log(this.currentPage);
