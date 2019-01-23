@@ -11,12 +11,7 @@
 
 
         <div class="userItem" v-for="user">
-            <UserItem v-bind:user="user"/>
-        </div>
-
-        <h1>Песни пользователя</h1>
-        <div class="songs-list" v-bind:key="song.id" v-for="song in songs">
-            <SongItem  v-bind:song="song"/>
+            <UserItem v-bind:user="user"></UserItem>
         </div>
 
     </div>
@@ -32,7 +27,6 @@
         data(){
             return{
                 userID: 1,
-                songs: [],
                 user: {},
                 showCollapse: false
             }
@@ -47,20 +41,12 @@
                     .catch(err => console.log(err));
             },
             updateData() {
-                axios.get('/api/users/' + this.userID)
-                    .then(res => {
-                        this.user = Object.assign({}, this.user, res.data);
-                        console.log(this.user);
-                        this.$forceUpdate();
-                    })
-                    .catch(err => console.log(err));
 
                 axios.get("/api/users/" + this.userID + "/songs")
                     .then(res => {
                         console.log(res.data);
-                        this.songs.splice(0, this.songs.length);
-                        this.songs.push(res.data);
-                        console.log(this.songs);
+                        this.user = Object.assign({}, this.user, res.data);
+                        console.log(this.user);
                         this.$forceUpdate();
                     })
                     .catch(err => console.log(err));

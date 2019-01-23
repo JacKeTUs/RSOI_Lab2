@@ -84,11 +84,13 @@ public class PurchasesServiceControllerTests {
     @Test
     public void findPurchase() throws Exception {
 
+	    List<Purchase> p = new ArrayList<>();
         Purchase purchase = new Purchase();
         purchase.setSongID(1L);
         purchase.setUserID(1L);
+        p.add(purchase);
 
-        given(purchasesRepository.findByUserID(1L)).willReturn(purchase);
+        given(purchasesRepository.getAllBySongID(1L)).willReturn(p);
         mvc.perform(get("/purchases/find")
                 .contentType("application/json")
                 .param("user_id", "1"))

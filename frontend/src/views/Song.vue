@@ -10,20 +10,25 @@
                     <br/>
                 </b-col>
                 <b-col cols="9">
-                    <p class="card-text" style="text-align: left">
+                    <p class="card-text" style="text-align: right">
                         <b-row>
                             <b-col cols="8" style="text-align: right">
-                                {{ song.rate_nums }} оценок
+                                {{ song.rateNum }} оценок
                             </b-col>
                         </b-row>
                         <br/>
                         <b-row>
-                            <b-col cols="6">
+                            <b-col cols="8">
+                                <b>Ссылка на песню: {{ song.link }}</b>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col cols="8">
                                 <b>Средний рейтинг: {{ song.rating }}</b>
                             </b-col>
                         </b-row>
                         <b-row>
-                            <b-col cols="6">
+                            <b-col cols="8">
                                 <b> Количество покупок: {{ song.buy_nums }}</b>
                             </b-col>
                         </b-row>
@@ -34,8 +39,14 @@
         </div>
 
         <div id="buy_song">
-            <button v-on:click="buySong">Приобрести песню</button>
+            <b-button
+                    v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" v-if="license"  style="margin: 10px">Песня уже куплена</b-button>
+            <b-button
+                    v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" v-else v-on:click="buySong" style="margin: 10px">Приобрести песню</b-button>
+
         </div>
+
+
     </div>
 </template>
 
@@ -46,9 +57,16 @@
         name:"Song",
         methods: {
             buySong(){
-                setTimeout(() => {this.updateData()}, 50);
+                console.log("Buy song!");
+                setTimeout(() => {this.updateData()}, 200);
 
-                this.currentPage = 0;
+                this.purchase.userID = 1; //Object.assign(this.purchase, "userID", 1);
+                this.purchase.songID = this.song.id; //= Object.assign(this.purchase, "songID", this.song.id);
+                axios.post("/api/purchase", this.purchase)
+                    .then(res => {
+                        this.$forceUpdate();
+                    })
+                    .catch(err => console.log(err));
             },
             updateData(){
                 console.log("update called");
@@ -61,11 +79,26 @@
                         this.$forceUpdate();
                     })
                     .catch(err => console.log(err));
+
+                axios.get("/api/users/" + 1 + "/songs/" + this.$route.params.id)
+                    .then(res => {
+                        console.log(res.data);
+                        if (res.data.license !== "true") {
+                            this.purchase = Object.assign({}, this.purchase, res.data.purchase);
+                            this.license = false;
+                        } else {
+                            this.license = true;
+                        }
+                        this.$forceUpdate();
+                    })
+                    .catch(err => console.log(err));
             },
         },
         data(){
             return {
-                song: {}
+                song: {},
+                purchase: {},
+                license: false,
             }
         },
         created() {
@@ -96,4 +129,10 @@
         padding: 20px
     }
 
+    .shadowed-button {
+        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .2)
+    }
+    .shadowed-button:hover{
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12)
+    }
 </style>

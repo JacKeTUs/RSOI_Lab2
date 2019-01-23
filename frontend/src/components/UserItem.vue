@@ -7,34 +7,29 @@
                 <strong>Количество покупок:</strong> {{ user.buy_num }}<br/>
             </p>
 
+            <h3>Песни пользователя</h3>
+            <div class="songs-list" v-bind:key="song.id" v-for="song in user.songs">
+                <UserSongItem v-bind:purchase="song"></UserSongItem>
+            </div>
         </b-card>
 
 
-        <div class="songs-list" v-bind:key="song.id" v-for="song in songs">
-            <SongItem  v-bind:song="song"/>
-        </div>
     </div>
 </template>
 
 <script>
-    import SongItem from '../components/SongItem';
+    import UserSongItem from '../components/UserSongItem';
     import axios from 'axios';
     export default{
         name: "UserItem",
+        components: {UserSongItem},
         props: ["user"],
         methods:{
             updateData() {
-                axios.get("/api/users/"+ this.userID + "/songs")
-                    .then(res => {
-                        this.songs.splice(0, this.songs.length);
-                        this.songs.push(...  res.data.content);
-                        this.$forceUpdate();})
-                    .catch(err => console.log(err));
-
 
                 axios.get('/api/users/' + this.userID)
                     .then(res => {
-                        this.user = Object.assign({}, this.user, res.data.content);
+                        //this.user = Object.assign({}, this.user, res.data.content);
                         console.log(this.user);
                         this.$forceUpdate();
                     })

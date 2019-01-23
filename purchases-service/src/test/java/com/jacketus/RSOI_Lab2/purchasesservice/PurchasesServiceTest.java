@@ -62,28 +62,32 @@ public class PurchasesServiceTest {
 
     @Test
     public void shouldFindPurchaseBySongID() throws PurchaseNotFoundException {
+        List<Purchase> purchases= new ArrayList<>();
         Purchase purchase = new Purchase();
         purchase.setSongID(5L);
         purchase.setUserID(1L);
+        purchases.add(purchase);
 
         given(purchasesRepository.save(purchase)).willReturn(purchase);
-        given(purchasesRepository.findBySongID(5L)).willReturn(purchase);
+        given(purchasesRepository.getAllBySongID(5L)).willReturn(purchases);
 
         purchasesService.createPurchase(purchase);
-        assertThat(purchasesService.findPurchaseBySongID(5L), is(purchase));
+        assertThat(purchasesService.findPurchaseBySongID(5L).get(0), is(purchase));
     }
 
     @Test
     public void shouldFindPurchaseByUserID() throws PurchaseNotFoundException {
+        List<Purchase> purchases= new ArrayList<>();
         Purchase purchase = new Purchase();
         purchase.setSongID(5L);
         purchase.setUserID(1L);
+        purchases.add(purchase);
 
         given(purchasesRepository.save(purchase)).willReturn(purchase);
-        given(purchasesRepository.findByUserID(1L)).willReturn(purchase);
+        given(purchasesRepository.getAllByUserID(1L)).willReturn(purchases);
 
         purchasesService.createPurchase(purchase);
-        assertThat(purchasesService.findPurchaseByUserID(1L), is(purchase));
+        assertThat(purchasesService.findPurchaseByUserID(1L).get(0), is(purchase));
     }
 
     @Test

@@ -4,7 +4,7 @@
             <b-col md="2">
                 <img src="../assets/song.svg" width="120" alt="Song cover" style="background: #f5f5f5;">
             </b-col>
-            <b-col class="card-block px-2" style="margin-left: 20px; text-align: left">
+            <b-col class="card-block px-2" style="margin-left: 120px; text-align: right">
                 <p class="card-text">
                     <strong>Автор:</strong> {{ song.artist }}<br/>
                     <strong>Название:</strong> {{ song.name }}<br/>

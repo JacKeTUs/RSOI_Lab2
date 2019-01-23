@@ -75,7 +75,7 @@ public class GatewayServiceImplementation implements GatewayService {
         res2 += EntityUtils.toString(response2.getEntity());
         try {
             JSONObject json1 = new JSONObject(res);
-            JSONObject json2 = new JSONObject(res2);
+            JSONArray json2 = new JSONArray(res2);
             json1.put("songs", json2);
 
             return json1.toString();
@@ -88,25 +88,32 @@ public class GatewayServiceImplementation implements GatewayService {
 
     @Override
     public String getUserSong(Long userId, Long songId) throws IOException {
-        String res = "";
+
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/check?user_id=" + userId + "&song_id=" + songId);
         HttpResponse response = httpClient.execute(request);
-        Long p_id = 0L;
+        Long p_id = -1L;
         try {
             JSONObject p = new JSONObject(EntityUtils.toString(response.getEntity()));
             p_id = p.getLong("id");
+        } catch (JSONException ignored) {
+        }
+
+        JSONObject res = new JSONObject();
+        try {
+            if (p_id == -1L) {
+                res.put("license", "false");
+            } else {
+                res.put("license", "true");
+                res.put("purchase", this.getPurchase(p_id));
+                request = new HttpGet(songsServiceUrl + "/songs/" + songId);
+                HttpResponse response3 = httpClient.execute(request);
+                res.put("song", EntityUtils.toString(response3.getEntity()));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        res += this.getPurchase(p_id);
-
-        request = new HttpGet(songsServiceUrl + "/songs/" + songId);
-        HttpResponse response3 = httpClient.execute(request);
-        res += EntityUtils.toString(response3.getEntity());
-
-        return res;
+        return res.toString();
     }
 
     @Override
