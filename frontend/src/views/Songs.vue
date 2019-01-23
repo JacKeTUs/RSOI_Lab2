@@ -5,7 +5,7 @@
         <b-pagination size="md"
                       v-model="currentPage"
                       :total-rows=pagesNum
-                      :per-page=1
+                      :per-page=5
                       style="margin: auto; padding-top: 20px">
         </b-pagination>
 
@@ -33,38 +33,36 @@
         methods: {
             linkGen(pageNum){
                 return "/api/songs/?page=" + (pageNum) + "&size=" + this.pageSize;
+            },
+            updateData() {
+                axios.get(this.pageLink)
+                    .then(res => {
+                        this.pagesNum = res.data.totalPages;
+                        this.songs.splice(0, this.songs.length);
+                        this.songs.push(...  res.data.content);
+                        console.log(res.data.content);
+                        console.log("-----------");
+                        console.log(this.songs);})
+                    .catch(err => console.log(err))
             }
         },
         data(){
             return{
-                songs:[],
+                songs: [],
                 currentPage: 1,
-                pagesNum: 0,
+                pagesNum: 3,
                 pageSize: 5
             }
         },
         created() {
-            axios.get(this.pageLink)
-                .then(res => {
-                    this.pagesNum = res.data.totalPages;
-                    this.songs.splice(0, this.songs.length);
-                    this.songs.push(...  res.data.content);
-                    console.log(res.data.content);
-                    console.log("-----------");
-                    console.log(this.songs);})
-                .catch(err => console.log(err))
+            this.updateData();
+            this.$on('input', (page) => {
+                console.log(page);
+                this.currentPage = page;
+                this.updateData();
+            })
         },
-        updateData() {
-            axios.get(this.pageLink)
-                .then(res => {
-                    this.pagesNum = res.data.totalPages;
-                    this.songs.splice(0, this.songs.length);
-                    this.songs.push(...  res.data.content);
-                    console.log(res.data.content);
-                    console.log("-----------");
-                    console.log(this.songs);})
-                .catch(err => console.log(err))
-        }
+
     }
 
 </script>

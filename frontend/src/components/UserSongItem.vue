@@ -24,7 +24,7 @@
         name: "UserSongItem",
         components: {truncate},
         data() {
-            return { 
+            return {
                 purchase: {},
                 song: {}
             }
