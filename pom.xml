@@ -15,6 +15,10 @@
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+        </dependency>
     </dependencies>
 	<packaging>pom</packaging>
 
@@ -34,6 +38,7 @@
 		<module>purchases-service</module>
 		<module>gateway-service</module>
 		<module>frontend</module>
+        <module>auth-service</module>
 	</modules>
 
 </project>
