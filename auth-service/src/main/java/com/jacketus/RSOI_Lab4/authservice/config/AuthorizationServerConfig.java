@@ -40,7 +40,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                     .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                     .scopes("read", "write")
                     .resourceIds("oauth2-resource")
-                    .accessTokenValiditySeconds(5000)
+                    .accessTokenValiditySeconds(30*60)
                 .and()
                     .withClient("some_client")
                     .secret("secret")
@@ -48,7 +48,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                     .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                     .scopes("read", "write")
                     .resourceIds("oauth2-resource")
-                    .accessTokenValiditySeconds(5000);
+                    .accessTokenValiditySeconds(30*60)
+                .and()
+                    .withClient("gateway")
+                    .secret("secret")
+                    .authorizedGrantTypes("client_credentials")
+                    .authorities("ROLE_CLIENT")
+                    .scopes("read", "write")
+                    .resourceIds("oauth2-resource")
+                    .accessTokenValiditySeconds(30*60);
 
     }
 

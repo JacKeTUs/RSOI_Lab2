@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
@@ -33,6 +35,7 @@ public class GatewayServiceImplementation implements GatewayService {
     final private String songsServiceUrl = "http://localhost:8070";
     final private String usersServiceUrl = "http://localhost:8071";
     final private String purchasesServiceUrl = "http://localhost:8072";
+    final private String authServiceUrl = "http://localhost:8081";
 
     @Override
     public String getSongs(PageRequest p) throws IOException {
@@ -203,7 +206,6 @@ public class GatewayServiceImplementation implements GatewayService {
         httpClient.execute(request3);
     }
 
-
     @Override
     public void addSong(@RequestBody String song) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -212,5 +214,61 @@ public class GatewayServiceImplementation implements GatewayService {
         request.addHeader("content-type", "application/json");
         request.setEntity(p);
         HttpResponse response = httpClient.execute(request);
+    }
+
+    // @Value( "${client.id}" )
+    private String client_id = "gateway";
+    // @Value( "${client_secret}" )
+    private String client_secret = "secret";
+
+    private String gateway_token = "";
+
+    private void askToken(String url) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request1 = new HttpPost(url + "/oauth/token?grant_type=client_credentials");
+        request1.addHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()));
+        HttpResponse r = httpClient.execute(request1);
+        try {
+            JSONObject p = new JSONObject(EntityUtils.toString(r.getEntity()));
+            this.gateway_token = p.getString("access_token");
+            System.out.println("update gateway token! " + gateway_token);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String checkToken(String token) throws IOException {
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request;
+        HttpResponse response = null;
+        int i = 0;
+        while (i <= 3) {
+            request = new HttpGet(authServiceUrl + "/oauth/check_token?token=" + token);
+            // request.addHeader("Authorization", "Bearer " + gateway_token);
+            request.addHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()));
+            response = httpClient.execute(request);
+
+            if (response.getStatusLine().getStatusCode() == 401 || response.getStatusLine().getStatusCode() == 403) {
+                askToken(authServiceUrl);
+            } else
+                break;
+            i++;
+        }
+
+        Boolean active = false;
+        String username = "";
+        try {
+            JSONObject p = new JSONObject(EntityUtils.toString(response.getEntity()));
+            active = p.getBoolean("active");
+            if (active) {
+                username = p.getString("user_name");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return username;
     }
 }
