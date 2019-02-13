@@ -19,8 +19,7 @@ public class HomeController {
     @GetMapping(value = "/")
     public String index(){
 
-        //us.save(new User("user", "pass", new ArrayList<Role>(), true));
+        //us.save(new User("user2", "pass2", new ArrayList<Role>(), true));
         return "Hello world";
-
     }
 }

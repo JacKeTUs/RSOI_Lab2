@@ -139,7 +139,7 @@ public class GatewayServiceImplementation implements GatewayService {
 
         res += EntityUtils.toString(response1.getEntity());
         request = new HttpGet(purchasesServiceUrl + "/purchases/find/?user_id=" + userId);
-        HttpResponse response2 = httpClient.execute(request);
+        HttpResponse response2;
 
         StringBuilder sb2 = new StringBuilder(purchases_token);
         response2 = this.executeRequestWithAuth(request, sb2, purchasesServiceUrl);
@@ -286,7 +286,7 @@ public class GatewayServiceImplementation implements GatewayService {
         HttpPost request = new HttpPost(usersServiceUrl + "/users");
         request.addHeader("content-type", "application/json");
         request.setEntity(p);
-        HttpResponse response = httpClient.execute(request);
+        HttpResponse response;
 
         StringBuilder sb = new StringBuilder(users_token);
         response = this.executeRequestWithAuth(request, sb, usersServiceUrl);
@@ -381,5 +381,19 @@ public class GatewayServiceImplementation implements GatewayService {
             i++;
         }
         return response;
+    }
+
+    @Override
+    public String getUserByLogin(String username) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpGet request = new HttpGet(usersServiceUrl + "/users/find?username=" + username);
+
+        HttpResponse response;
+        StringBuilder sb = new StringBuilder(users_token);
+        response = this.executeRequestWithAuth(request, sb, usersServiceUrl);
+        users_token = sb.toString();
+
+        return EntityUtils.toString(response.getEntity());
     }
 }

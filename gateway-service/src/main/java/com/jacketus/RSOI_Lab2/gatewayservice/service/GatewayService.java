@@ -50,4 +50,7 @@ public interface GatewayService {
 
     // Проверить токен
     HttpResponse checkToken(String auth_url, String token) throws IOException;
+
+    // Найти пользователя по имени
+    String getUserByLogin(String username) throws IOException;
 }

@@ -83,7 +83,23 @@ public class GatewayServiceController {
         return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
     }
 
-    // Посмотреть список песен
+
+    @GetMapping(path = "/users/find", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getUserByLogin(@RequestParam(value = "username") String username, @RequestHeader("Authorization") String token) throws IOException, JSONException {
+        logger.info("[GET] /users/find username="+username);
+
+        // Проверяем данный нам токен у аут.сервиса
+        token = token.replace("Bearer ","");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
+        }
+
+        return ResponseEntity.ok(gatewayService.getUserByLogin(username));
+    }
+
+
+        // Посмотреть список песен
     @GetMapping(path = "/songs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 

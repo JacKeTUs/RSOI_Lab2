@@ -20,7 +20,6 @@
         components: {UserItem, AddUserForm},
         data(){
             return{
-                userID: 1,
                 user: {},
                 showCollapse: false,
                 authenticated: false,
@@ -49,7 +48,7 @@
                 } else {
                     this.authenticated = false;
                 };
-                axios.get("/api/users/" + this.userID + "/songs", {
+                axios.get("/api/users/" + this.$store.getters.get_user_id + "/songs", {
                     headers: {
                         Authorization: 'Bearer ' + this.$store.getters.get_token
                     }

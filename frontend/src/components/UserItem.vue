@@ -27,7 +27,7 @@
         methods:{
             updateData() {
 
-                axios.get('/api/users/' + this.userID, {
+                axios.get('/api/users/' + this.$store.getters.get_user_id, {
                     headers: {
                         Authorization: 'Bearer ' + this.$store.getters.get_token
                     }
@@ -42,7 +42,6 @@
         },
         data() {
             return {
-                userID: 5,
                 songs: [],
                 user: {}
             }

@@ -60,7 +60,7 @@
                 console.log("Buy song!");
                 setTimeout(() => {this.updateData()}, 200);
 
-                this.purchase.userID = 1; //Object.assign(this.purchase, "userID", 1);
+                this.purchase.userID = this.$store.getters.get_user_id; //Object.assign(this.purchase, "userID", 1);
                 this.purchase.songID = this.song.id; //= Object.assign(this.purchase, "songID", this.song.id);
                 axios.post("/api/purchase", this.purchase, {
                     headers: {
@@ -87,7 +87,7 @@
                     })
                     .catch(err => console.log(err));
 
-                axios.get("/api/users/" + 1 + "/songs/" + this.$route.params.id, {
+                axios.get("/api/users/" + this.$store.getters.get_user_id + "/songs/" + this.$route.params.id, {
                     headers: {
                         Authorization: 'Bearer ' + this.$store.getters.get_token
                     }

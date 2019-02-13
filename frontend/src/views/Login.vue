@@ -33,6 +33,15 @@
                     }
                 }).then(response => {
                     this.$store.commit('LOGIN_SUCCESS', response);
+
+                    axios.get('/api/users/find?username='+this.input.username, {
+                        headers: {
+                            Authorization: 'Bearer ' + this.$store.getters.get_token
+                        }
+                    }).then(response => {
+                        this.$store.commit('USER_SUCCESS', response);
+                    });
+
                     this.$router.push("/")
                 }).catch(error => {
                     console.log("Error login")
