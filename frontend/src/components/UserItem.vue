@@ -27,7 +27,11 @@
         methods:{
             updateData() {
 
-                axios.get('/api/users/' + this.userID)
+                axios.get('/api/users/' + this.userID, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         //this.user = Object.assign({}, this.user, res.data.content);
                         console.log(this.user);

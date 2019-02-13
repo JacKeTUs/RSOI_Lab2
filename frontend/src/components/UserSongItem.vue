@@ -34,7 +34,11 @@
         },
         methods: {
             updateData() {
-                axios.get("/api/songs/" + this.purchase.songID)
+                axios.get("/api/songs/" + this.purchase.songID, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         console.log(res.data);
                         this.song = Object.assign({}, this.song, res.data);

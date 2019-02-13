@@ -48,7 +48,7 @@ public class GatewayServiceController {
         return new ResponseEntity<String>(headers, HttpStatus.FOUND);
     }
 
-// http://localhost:8081/oauth/token?grant_type=authorization_code&code=MlBHlY&redirect_uri=http%3A%2F%2Fexample.com
+    // http://localhost:8081/oauth/token?grant_type=authorization_code&code=MlBHlY&redirect_uri=http%3A%2F%2Fexample.com
     // Обмен кода OAUTH
     @GetMapping(path = "/oauth/token", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity oauth_token(
@@ -59,10 +59,9 @@ public class GatewayServiceController {
         logger.info("[GET] /oauth/token");
 
         // Меняем код у аут.сервиса
-        //token = token.replace("Bearer ","");
+
         String clientCode = "";
         client_cred = client_cred.replace("Basic","");
-
 
         String r = gatewayService.oauth_exchangecode(authServiceUrl, code, redirect_uri, client_cred);
 
@@ -79,31 +78,25 @@ public class GatewayServiceController {
         String clientToken = "";
         clientCred = clientCred.replace("Basic", "");
         // http://localhost:8081/oauth/token?grant_type=password&username=user&password=pass
-        clientToken = gatewayService.askToken(authServiceUrl + "/oauth/token?grant_type=password&username="+username+"&password="+password, clientCred);
-        if (clientToken.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\n" +
-                                                                            "  \"error\": \"invalid_grant\",\n" +
-                                                                            "  \"error_description\": \"Bad credentials\"\n" +
-                                                                            "}");
+        HttpResponse hr = gatewayService.askToken(authServiceUrl + "/oauth/token?grant_type=password&username="+username+"&password="+password, clientCred);
 
-        return ResponseEntity.ok(clientToken);
+        return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
     }
 
     // Посмотреть список песен
     @GetMapping(path = "/songs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
+        logger.info("[GET] /songs, page: " + page + ", size: " + size);
+
         // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
-        logger.info("[GET] /songs, page: " + page + ", size: " + size);
+
         PageRequest p;
         p = PageRequest.of(page, size);
         return ResponseEntity.ok(gatewayService.getSongs(p));
@@ -113,12 +106,11 @@ public class GatewayServiceController {
     @GetMapping(path = "/songs/{songID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongByID(@PathVariable Long songID, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[GET] /songs/"+songID);
@@ -129,12 +121,11 @@ public class GatewayServiceController {
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getUserById(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[GET] /users/" +userId);
@@ -145,12 +136,11 @@ public class GatewayServiceController {
     @GetMapping(path = "/users/{userId}/songs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongsByUser(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[GET] /users/" + userId + "/songs");
@@ -161,12 +151,11 @@ public class GatewayServiceController {
     @GetMapping(path = "/users/{userId}/songs/{songId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongsByUser(@PathVariable Long userId, @PathVariable Long songId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[GET] /users/" + userId + "/songs/" + songId);
@@ -177,12 +166,11 @@ public class GatewayServiceController {
     @GetMapping(value = "/purchases/{purchaseID}")
     public ResponseEntity getSongPurchases(@PathVariable Long purchaseID, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[GET] /purchases/" + purchaseID);
@@ -194,12 +182,11 @@ public class GatewayServiceController {
     @PostMapping(value = "/purchase")
     public ResponseEntity purchaseSong(@RequestBody String purchase, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[POST] /purchase, purchase: " + purchase);
@@ -211,12 +198,11 @@ public class GatewayServiceController {
     @PostMapping(value = "/users")
     public ResponseEntity addUser(@RequestBody String user, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[POST] /users ", "user: ", user);
@@ -228,12 +214,11 @@ public class GatewayServiceController {
     @PostMapping(value = "/users/{userID}/songs/{songID}/rate")
     public ResponseEntity addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: " + rate);
@@ -245,12 +230,11 @@ public class GatewayServiceController {
     @PostMapping(value = "/songs")
     public ResponseEntity addSong(@RequestBody String song, @RequestHeader("Authorization") String token) throws IOException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
-                    "  \"error\": \"invalid_token\",\n" +
-                    "  \"error_description\": \"Token was not recognised\"\n" +
-                    "}");
+        HttpResponse hr = gatewayService.checkToken(authServiceUrl, token);
+        if (hr.getStatusLine().getStatusCode() != 200) {
+            return ResponseEntity.status(hr.getStatusLine().getStatusCode()).body(EntityUtils.toString(hr.getEntity()));
         }
 
         logger.info("[POST] /songs ", "song: ", song);

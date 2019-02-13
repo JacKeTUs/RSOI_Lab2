@@ -38,7 +38,11 @@
                 return "/api/songs/?page=" + (pageNum) + "&size=" + this.pageSize;
             },
             updateData() {
-                axios.get(this.pageLink)
+                axios.get(this.pageLink, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         console.log(res.data);
                         this.pagesNum = res.data.totalPages;

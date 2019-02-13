@@ -62,7 +62,11 @@
 
                 this.purchase.userID = 1; //Object.assign(this.purchase, "userID", 1);
                 this.purchase.songID = this.song.id; //= Object.assign(this.purchase, "songID", this.song.id);
-                axios.post("/api/purchase", this.purchase)
+                axios.post("/api/purchase", this.purchase, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         this.$forceUpdate();
                     })
@@ -70,8 +74,11 @@
             },
             updateData(){
                 console.log("update called");
-
-                axios.get("/api/songs/" + this.$route.params.id)
+                axios.get("/api/songs/" + this.$route.params.id, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         console.log(res.data);
                         this.song = Object.assign({}, this.song, res.data);
@@ -80,7 +87,11 @@
                     })
                     .catch(err => console.log(err));
 
-                axios.get("/api/users/" + 1 + "/songs/" + this.$route.params.id)
+                axios.get("/api/users/" + 1 + "/songs/" + this.$route.params.id, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         console.log(res.data);
                         if (res.data.license !== "true") {

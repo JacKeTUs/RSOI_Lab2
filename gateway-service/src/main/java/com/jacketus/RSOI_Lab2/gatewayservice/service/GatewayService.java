@@ -1,14 +1,11 @@
 package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
 import org.apache.http.HttpResponse;
-import org.json.JSONException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.awt.print.Pageable;
 import java.io.IOException;
 
 
@@ -49,8 +46,8 @@ public interface GatewayService {
     void addSong(@RequestBody String song) throws IOException;
 
     // Запросить токен у URL
-    String askToken(String url, String clientCred) throws IOException;
+    HttpResponse askToken(String url, String clientCred) throws IOException;
 
     // Проверить токен
-    String checkToken(String auth_url, String token) throws IOException;
+    HttpResponse checkToken(String auth_url, String token) throws IOException;
 }

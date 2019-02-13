@@ -6,30 +6,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.awt.print.Pageable;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
-
-import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Service
 public class GatewayServiceImplementation implements GatewayService {
@@ -51,7 +38,7 @@ public class GatewayServiceImplementation implements GatewayService {
 
     @Override
     public String oauth_getcode(String auth_url, String client_id, String redirect_uri, String response_type) throws IOException {
-                            return (auth_url + "/oauth/authorize?grant_type=authorization_code&client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type="+response_type);
+        return (auth_url + "/oauth/authorize?grant_type=authorization_code&client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type="+response_type);
     }
 
     @Override
@@ -82,7 +69,15 @@ public class GatewayServiceImplementation implements GatewayService {
             response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == 401 || response.getStatusLine().getStatusCode() == 403) {
                 token.delete(0, token.length());
-                token.append(askToken(service_url + "/oauth/token?grant_type=client_credentials", Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes())));
+                String t = "";
+                HttpResponse hr = askToken(service_url + "/oauth/token?grant_type=client_credentials", Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()));
+                try {
+                    JSONObject p = new JSONObject(EntityUtils.toString(hr.getEntity()));
+                    t = p.getString("access_token");
+                } catch (JSONException e) {
+                    t = "";
+                }
+                token.append(t);
             } else
                 //return response;
                 break;
@@ -349,28 +344,17 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
 
-
-
     @Override
-    public String askToken(String url, String clientCred) throws IOException {
-        String token = "";
+    public HttpResponse askToken(String url, String clientCred) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request1 = new HttpPost(url);
         request1.addHeader("Authorization", "Basic " + clientCred);
-        HttpResponse r = httpClient.execute(request1);
 
-        try {
-            JSONObject p = new JSONObject(EntityUtils.toString(r.getEntity()));
-            token = p.getString("access_token");
-            System.out.println("token! " + token);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return token;
+        return httpClient.execute(request1);
     }
 
     @Override
-    public String checkToken(String auth_url, String token) throws IOException {
+    public HttpResponse checkToken(String auth_url, String token) throws IOException {
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request;
@@ -383,24 +367,19 @@ public class GatewayServiceImplementation implements GatewayService {
             response = httpClient.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 401 || response.getStatusLine().getStatusCode() == 403) {
-                this.gateway_token = askToken(auth_url + "/oauth/token?grant_type=client_credentials", Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()));
+                HttpResponse r = askToken(auth_url + "/oauth/token?grant_type=client_credentials", Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()));
+                String t = "";
+                try {
+                    JSONObject p = new JSONObject(EntityUtils.toString(r.getEntity()));
+                    t = p.getString("access_token");
+                } catch (JSONException e) {
+                    t = "";
+                }
+                this.gateway_token = t;
             } else
                 break;
             i++;
         }
-
-        Boolean active = false;
-        String username = "";
-        try {
-            JSONObject p = new JSONObject(EntityUtils.toString(response.getEntity()));
-            active = p.getBoolean("active");
-            if (active) {
-                username = p.getString("user_name");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return username;
+        return response;
     }
 }
