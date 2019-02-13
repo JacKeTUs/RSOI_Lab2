@@ -2,11 +2,14 @@ package com.jacketus.RSOI_Lab2.gatewayservice.controller;
 
 import com.jacketus.RSOI_Lab2.gatewayservice.service.GatewayService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,44 @@ public class GatewayServiceController {
     public GatewayServiceController(GatewayService gatewayService){
         logger = LoggerFactory.getLogger(GatewayServiceController.class);
         this.gatewayService = gatewayService;
+    }
+
+    // Авторизация OAUTH
+    @GetMapping(path = "/oauth/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity oauthlogin(
+            //@RequestParam(value = "grant_type") String grant_type,
+            @RequestParam(value = "client_id") String client_id,
+            @RequestParam(value = "redirect_uri") String redirect_uri
+            /*@RequestParam(value = "response_type") String response_type*/) throws IOException, JSONException {
+
+        logger.info("[GET] /oauth/login");
+
+        // Редирект к аут.сервису с нашими параметрами...
+        String r = gatewayService.oauth_getcode(authServiceUrl, client_id, redirect_uri, "code");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", r);
+        return new ResponseEntity<String>(headers, HttpStatus.FOUND);
+    }
+
+// http://localhost:8081/oauth/token?grant_type=authorization_code&code=MlBHlY&redirect_uri=http%3A%2F%2Fexample.com
+    // Обмен кода OAUTH
+    @GetMapping(path = "/oauth/token", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity oauth_token(
+            @RequestParam(value = "code") String code,
+            @RequestParam(value = "redirect_uri") String redirect_uri,
+            @RequestHeader("Authorization") String client_cred) throws IOException, JSONException {
+
+        logger.info("[GET] /oauth/token");
+
+        // Меняем код у аут.сервиса
+        //token = token.replace("Bearer ","");
+        String clientCode = "";
+        client_cred = client_cred.replace("Basic","");
+
+
+        String r = gatewayService.oauth_exchangecode(authServiceUrl, code, redirect_uri, client_cred);
+
+        return ResponseEntity.ok(r);
     }
 
     // Авторизация

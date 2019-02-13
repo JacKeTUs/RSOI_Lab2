@@ -1,5 +1,6 @@
 package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
+import org.apache.http.HttpResponse;
 import org.json.JSONException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,10 @@ import java.io.IOException;
 
 
 public interface GatewayService {
+
+    String oauth_getcode(String auth_url, String client_id, String redirect_uri, String response_type) throws IOException;
+
+    String oauth_exchangecode(String auth_url, String code, String redirect_uri, String client_cred) throws IOException;
 
     // Просмотреть все песни
     String getSongs(PageRequest p) throws IOException;
