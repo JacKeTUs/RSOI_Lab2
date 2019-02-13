@@ -32,7 +32,7 @@ public class UsersServiceImplementation implements UsersService{
     public User findUserByLogin(String login) throws UserNotFoundException{
         User user = usersRepository.findByLogin(login);
         if (user == null)
-            throw  new UserNotFoundException(login);
+            throw new UserNotFoundException(login);
         return user;
     }
 

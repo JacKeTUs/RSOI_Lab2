@@ -2,13 +2,7 @@
     <div class="users" >
         <h1>Профиль</h1>
         <b-button
-            v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" style="margin: 10px">Добавить пользователя</b-button>
-        <b-collapse id="collapse1" v-model="showCollapse" class="mt-2">
-            <AddUserForm style="width: 50%; margin: auto"
-                         v-on:hide-add-user-form="hideAddUserForm"
-                         v-on:add-user="addUser"/>
-        </b-collapse>
-
+                class="btn btn-info btn-sm shadowed-button" v-if="authenticated" v-on:click="unlogin" style="margin: 10px">Разлогиниться</b-button>
 
         <div class="userItem" v-for="user">
             <UserItem v-bind:user="user"></UserItem>
@@ -26,23 +20,39 @@
         components: {UserItem, AddUserForm},
         data(){
             return{
-                userID: 1,
                 user: {},
-                showCollapse: false
+                showCollapse: false,
+                authenticated: false,
             }
         },
         methods: {
+            unlogin() {
+                this.$store.commit('UNLOGIN_SUCCESS');
+                this.$router.push("/");
+            },
             addUser(_user){
 
                 setTimeout(() => {this.updateData()}, 500);
 
-                axios.post('/api/users', _user)
+                axios.post('/api/users', _user, {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(this.hideAddUserForm)
                     .catch(err => console.log(err));
             },
             updateData() {
-
-                axios.get("/api/users/" + this.userID + "/songs")
+                if (this.$store.getters.isAuthenticated) {
+                    this.authenticated = true;
+                } else {
+                    this.authenticated = false;
+                };
+                axios.get("/api/users/" + this.$store.getters.get_user_id + "/songs", {
+                    headers: {
+                        Authorization: 'Bearer ' + this.$store.getters.get_token
+                    }
+                })
                     .then(res => {
                         console.log(res.data);
                         this.user = Object.assign({}, this.user, res.data);

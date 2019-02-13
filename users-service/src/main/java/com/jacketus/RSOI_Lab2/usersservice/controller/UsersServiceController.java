@@ -50,4 +50,12 @@ public class UsersServiceController {
         logger.info("[POST] /users/" + id + "/buy");
         usersService.incBuyNum(id);
     }
+
+    // Поиск по username
+    @GetMapping(value = "/users/find")
+    public User getUserByName(@RequestParam(value = "username") String username) throws UserNotFoundException {
+        logger.info("[GET] /users/"+ username);
+        return usersService.findUserByLogin(username);
+    }
+
 }

@@ -1,17 +1,19 @@
 package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
-import org.json.JSONException;
+import org.apache.http.HttpResponse;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.awt.print.Pageable;
 import java.io.IOException;
 
 
 public interface GatewayService {
+
+    String oauth_getcode(String auth_url, String client_id, String redirect_uri, String response_type) throws IOException;
+
+    String oauth_exchangecode(String auth_url, String code, String redirect_uri, String client_cred) throws IOException;
 
     // Просмотреть все песни
     String getSongs(PageRequest p) throws IOException;
@@ -42,4 +44,13 @@ public interface GatewayService {
 
     // Добавить песню
     void addSong(@RequestBody String song) throws IOException;
+
+    // Запросить токен у URL
+    HttpResponse askToken(String url, String clientCred) throws IOException;
+
+    // Проверить токен
+    HttpResponse checkToken(String auth_url, String token) throws IOException;
+
+    // Найти пользователя по имени
+    String getUserByLogin(String username) throws IOException;
 }
