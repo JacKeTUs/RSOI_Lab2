@@ -33,10 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/oauth/check_token").permitAll()
+                .antMatchers("/oauth/check_token").authenticated()
                 .antMatchers("/oauth/token").permitAll()
                 .antMatchers("/oauth/authorize").permitAll()
-                .antMatchers("/oauth/check_token").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .httpBasic()

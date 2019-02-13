@@ -16,11 +16,11 @@ import java.awt.print.Pageable;
 import java.io.IOException;
 
 @RestController
-@Slf4j
 @RequestMapping("/api")
 public class GatewayServiceController {
     private final GatewayService gatewayService;
     private Logger logger;
+    final private String authServiceUrl = "http://localhost:8081";
 
     @Autowired
     public GatewayServiceController(GatewayService gatewayService){
@@ -28,13 +28,38 @@ public class GatewayServiceController {
         this.gatewayService = gatewayService;
     }
 
+    // Авторизация
+    @GetMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity login(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password, @RequestHeader("Authorization") String clientCred) throws IOException, JSONException {
+
+        logger.info("[GET] /login");
+        // Берём токен для клиентского приложения у аут.сервиса
+        //token = token.replace("Bearer ","");
+        String clientToken = "";
+        clientCred = clientCred.replace("Basic", "");
+        // http://localhost:8081/oauth/token?grant_type=password&username=user&password=pass
+        clientToken = gatewayService.askToken(authServiceUrl + "/oauth/token?grant_type=password&username="+username+"&password="+password, clientCred);
+        if (clientToken.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\n" +
+                                                                            "  \"error\": \"invalid_grant\",\n" +
+                                                                            "  \"error_description\": \"Bad credentials\"\n" +
+                                                                            "}");
+
+        return ResponseEntity.ok(clientToken);
+    }
+
     // Посмотреть список песен
     @GetMapping(path = "/songs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getSongs(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
+        // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /songs, page: " + page + ", size: " + size);
@@ -48,8 +73,11 @@ public class GatewayServiceController {
     public ResponseEntity getSongByID(@PathVariable Long songID, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /songs/"+songID);
@@ -61,8 +89,11 @@ public class GatewayServiceController {
     public ResponseEntity getUserById(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /users/" +userId);
@@ -74,8 +105,11 @@ public class GatewayServiceController {
     public ResponseEntity getSongsByUser(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /users/" + userId + "/songs");
@@ -87,8 +121,11 @@ public class GatewayServiceController {
     public ResponseEntity getSongsByUser(@PathVariable Long userId, @PathVariable Long songId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /users/" + userId + "/songs/" + songId);
@@ -100,8 +137,11 @@ public class GatewayServiceController {
     public ResponseEntity getSongPurchases(@PathVariable Long purchaseID, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[GET] /purchases/" + purchaseID);
@@ -114,8 +154,11 @@ public class GatewayServiceController {
     public ResponseEntity purchaseSong(@RequestBody String purchase, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[POST] /purchase, purchase: " + purchase);
@@ -128,8 +171,11 @@ public class GatewayServiceController {
     public ResponseEntity addUser(@RequestBody String user, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[POST] /users ", "user: ", user);
@@ -142,8 +188,11 @@ public class GatewayServiceController {
     public ResponseEntity addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: " + rate);
@@ -156,8 +205,11 @@ public class GatewayServiceController {
     public ResponseEntity addSong(@RequestBody String song, @RequestHeader("Authorization") String token) throws IOException {
 
         token = token.replace("Bearer ","");
-        if (gatewayService.checkToken(token).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (gatewayService.checkToken(authServiceUrl, token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\n" +
+                    "  \"error\": \"invalid_token\",\n" +
+                    "  \"error_description\": \"Token was not recognised\"\n" +
+                    "}");
         }
 
         logger.info("[POST] /songs ", "song: ", song);

@@ -43,6 +43,9 @@ public interface GatewayService {
     // Добавить песню
     void addSong(@RequestBody String song) throws IOException;
 
+    // Запросить токен у URL
+    String askToken(String url, String clientCred) throws IOException;
+
     // Проверить токен
-    String checkToken(String token) throws IOException;
+    String checkToken(String auth_url, String token) throws IOException;
 }
