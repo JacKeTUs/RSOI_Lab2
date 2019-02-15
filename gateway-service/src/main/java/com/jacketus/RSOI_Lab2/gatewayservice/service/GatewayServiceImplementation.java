@@ -1,5 +1,7 @@
 package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
+import com.jacketus.RSOI_Lab2.gatewayservice.redisq.JedisManager;
+import com.jacketus.RSOI_Lab2.gatewayservice.redisq.WorkThread;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.HttpHostConnectException;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -36,6 +39,10 @@ public class GatewayServiceImplementation implements GatewayService {
     private String purchases_token = "";
     private String users_token = "";
 
+    private Jedis jedis = new Jedis("127.0.0.1", 6379);
+    private JedisManager jedisManager = new JedisManager(jedis);
+    private WorkThread workThread = new WorkThread(jedis);
+
 
 
     @Override
@@ -55,6 +62,11 @@ public class GatewayServiceImplementation implements GatewayService {
         return EntityUtils.toString(response.getEntity());
     }
 
+    private HttpUriRequest buildRequestWithAuth(HttpUriRequest request, StringBuilder token) throws IOException {
+        request.removeHeaders("Authorization");
+        request.addHeader("Authorization", "Bearer " + token.toString());
+        return request;
+    }
 
 
     private HttpResponse executeRequestWithAuth(HttpUriRequest request, StringBuilder token, String service_url) throws IOException {
@@ -298,18 +310,34 @@ public class GatewayServiceImplementation implements GatewayService {
 
         if (!EntityUtils.toString(response1.getEntity()).isEmpty() &&
                 !EntityUtils.toString(response2.getEntity()).isEmpty()) {
+
+
             HttpPost request3 = new HttpPost(purchasesServiceUrl + "/purchases");
             request3.addHeader("content-type", "application/json");
             request3.setEntity(p);
             HttpResponse response3;
 
-            StringBuilder sb3 = new StringBuilder(purchases_token);
-            response3 = this.executeRequestWithAuth(request3, sb3, purchasesServiceUrl);
-            purchases_token = sb3.toString();
+            try {
+                StringBuilder sb3 = new StringBuilder(purchases_token);
+                response3 = this.executeRequestWithAuth(request3, sb3, purchasesServiceUrl);
+                purchases_token = sb3.toString();
+                if (response3.getStatusLine().getStatusCode() != 200) {
+                    throw new Exception("Purchases not available");
+                }
+            } catch (Exception e) {
+                // Ошибка. Добавляем в редиску
+                request3 = (HttpPost)buildRequestWithAuth(request3, new StringBuilder(purchases_token));
+                try {
+                    jedisManager.addReqToQueue("POST", request3, Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()), purchasesServiceUrl);
+                    workThread.start();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                // Пока очередь делает своё дело, доделываем оставшееся.
+            }
 
             // Обновление счетчика песен у пользователя
             HttpPost request4 = new HttpPost(usersServiceUrl + "/users/"+userID+"/buy");
-            //httpClient.execute(request4);
 
             StringBuilder sb4 = new StringBuilder(users_token);
             this.executeRequestWithAuth(request4, sb4, usersServiceUrl);
@@ -330,6 +358,7 @@ public class GatewayServiceImplementation implements GatewayService {
                 e1.printStackTrace();
             }
         }
+
 
         return ResponseEntity.status(status_code).body(res.toString());
     }
