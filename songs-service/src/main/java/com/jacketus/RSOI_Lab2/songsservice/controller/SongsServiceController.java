@@ -64,6 +64,12 @@ public class SongsServiceController {
         songsService.incBuyNum(id);
     }
 
+    @PutMapping(value="/songs/edit")
+    public void putUser(@RequestBody Song p) throws SongNotFoundException {
+        logger.info("[PUT] /songs/edit");
+        songsService.putSong(p);
+    }
+
     @GetMapping(value = "/check_health")
     public ResponseEntity checkHealth(){
         logger.info("[GET] /check_health");

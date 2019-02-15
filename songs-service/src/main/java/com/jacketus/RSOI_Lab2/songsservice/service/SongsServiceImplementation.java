@@ -90,5 +90,16 @@ public class SongsServiceImplementation implements SongsService {
         return ResponseEntity.ok(json1.toString());
     }
 
+    @Override
+    public Song putSong(Song p) throws SongNotFoundException {
+        return songsRepository.findById(p.getId()).map(Song -> {
+            Song.setBuy_nums(p.getBuy_nums());
+            Song.setRating(p.getRating());
+            Song.setLink(p.getLink());
+            Song.setArtist(p.getArtist());
+            Song.setName(p.getName());
+            return songsRepository.save(Song);
+        }).orElseThrow(() -> new SongNotFoundException(p.getId()));
+    }
 
 }

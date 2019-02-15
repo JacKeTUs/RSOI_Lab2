@@ -65,6 +65,13 @@ public class PurchasesServiceController {
         purchasesService.rate(id, rating);
     }
 
+
+    @PutMapping(value="/purchases/edit")
+    public void putUser(@RequestBody Purchase p) throws PurchaseNotFoundException {
+        logger.info("[PUT] /purchases/edit");
+        purchasesService.putPurchase(p);
+    }
+
     @GetMapping(value = "/check_health")
     public ResponseEntity checkHealth(){
         logger.info("[GET] /check_health");

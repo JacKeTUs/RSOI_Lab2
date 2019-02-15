@@ -15,6 +15,7 @@ public interface SongsService {
     int getRateNum(Long id) throws SongNotFoundException;
     void incBuyNum(Long id) throws SongNotFoundException;
     int getBuyNum(Long id) throws SongNotFoundException;
+    Song putSong(Song p) throws SongNotFoundException;
 
     ResponseEntity check_health();
 }

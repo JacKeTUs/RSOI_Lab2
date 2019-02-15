@@ -66,4 +66,15 @@ public class UsersServiceImplementation implements UsersService{
 
         return ResponseEntity.ok(json1.toString());
     }
+
+    @Override
+    public User putUser(User newUser) throws UserNotFoundException {
+        return usersRepository.findById(newUser.getId()).map(User -> {
+            User.setName(newUser.getName());
+            User.setLogin(newUser.getLogin());
+            User.setBuy_num(newUser.getBuy_num());
+            return usersRepository.save(User);
+        }).orElseThrow(() -> new UserNotFoundException(newUser.getId()));
+    }
+
 }

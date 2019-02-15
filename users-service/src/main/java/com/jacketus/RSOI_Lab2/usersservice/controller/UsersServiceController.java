@@ -60,6 +60,12 @@ public class UsersServiceController {
         return usersService.findUserByLogin(username);
     }
 
+    @PutMapping(value="/users/edit")
+    public void putUser(@RequestBody User user) throws UserNotFoundException {
+        logger.info("[PUT] /users/edit");
+        usersService.putUser(user);
+    }
+
     @GetMapping(value = "/check_health")
     public ResponseEntity checkHealth(){
         logger.info("[GET] /check_health");

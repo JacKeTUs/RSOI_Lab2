@@ -160,12 +160,12 @@ public class GatewayServiceController {
         }
 
         logger.info("[GET] /users/" + userId + "/songs");
-        return ResponseEntity.ok(gatewayService.getSongsByUser(userId));
+        return gatewayService.getSongsByUser(userId);
     }
 
     // Посмотреть песню пользователя
     @GetMapping(path = "/users/{userId}/songs/{songId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getSongsByUser(@PathVariable Long userId, @PathVariable Long songId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
+    public ResponseEntity getSongByUser(@PathVariable Long userId, @PathVariable Long songId, @RequestHeader("Authorization") String token) throws IOException, JSONException {
 
         // Проверяем данный нам токен у аут.сервиса
         token = token.replace("Bearer ","");
@@ -206,8 +206,8 @@ public class GatewayServiceController {
         }
 
         logger.info("[POST] /purchase, purchase: " + purchase);
-        gatewayService.purchaseSong(purchase);
-        return ResponseEntity.ok("ok");
+
+        return gatewayService.purchaseSong(purchase);
     }
 
     // Добавить пользователя
@@ -222,8 +222,8 @@ public class GatewayServiceController {
         }
 
         logger.info("[POST] /users ", "user: ", user);
-        gatewayService.addUser(user);
-        return ResponseEntity.ok("ok");
+
+        return gatewayService.addUser(user);
     }
 
     // Добавить рейтинг песне
@@ -238,8 +238,8 @@ public class GatewayServiceController {
         }
 
         logger.info("[POST] /users/" + userID + "/songs/" + songID + "/rate, rating: " + rate);
-        gatewayService.addRatingForSong(userID, songID, rate);
-        return ResponseEntity.ok("ok");
+
+        return gatewayService.addRatingForSong(userID, songID, rate);
     }
 
     // Добавить песню
@@ -262,8 +262,6 @@ public class GatewayServiceController {
     @GetMapping(value = "/check_health")
     public ResponseEntity checkHealth() throws IOException {
         logger.info("[GET] /check_health ");
-
-
 
         return ResponseEntity.ok(gatewayService.checkAllServices());
     }

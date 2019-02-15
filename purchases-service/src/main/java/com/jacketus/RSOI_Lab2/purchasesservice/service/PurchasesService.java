@@ -16,5 +16,7 @@ public interface PurchasesService {
     void rate(Long id, int rating) throws PurchaseNotFoundException;
 
     ResponseEntity check_health();
+
+    Purchase putPurchase(Purchase p) throws PurchaseNotFoundException;
 }
 

@@ -80,4 +80,14 @@ public class PurchasesServiceImplementation implements PurchasesService{
         return ResponseEntity.ok(json1.toString());
     }
 
+
+    @Override
+    public Purchase putPurchase(Purchase p) throws PurchaseNotFoundException {
+        return purchasesRepository.findById(p.getId()).map(Purchase -> {
+            Purchase.setUserID(p.getUserID());
+            Purchase.setSongID(p.getSongID());
+            Purchase.setRating(p.getRating());
+            return purchasesRepository.save(Purchase);
+        }).orElseThrow(() -> new PurchaseNotFoundException(p.getId()));
+    }
 }

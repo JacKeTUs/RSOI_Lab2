@@ -17,6 +17,8 @@ public interface UsersService {
 
     User createUser(User user);
 
+    User putUser(User user) throws UserNotFoundException;
+
     ResponseEntity check_health();
 }
 
