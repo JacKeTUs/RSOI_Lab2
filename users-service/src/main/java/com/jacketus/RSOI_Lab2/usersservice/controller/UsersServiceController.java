@@ -4,9 +4,11 @@ import com.jacketus.RSOI_Lab2.usersservice.entity.User;
 import com.jacketus.RSOI_Lab2.usersservice.exception.UserNotFoundException;
 import com.jacketus.RSOI_Lab2.usersservice.service.UsersService;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.jackson.map.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,6 +58,19 @@ public class UsersServiceController {
     public User getUserByName(@RequestParam(value = "username") String username) throws UserNotFoundException {
         logger.info("[GET] /users/"+ username);
         return usersService.findUserByLogin(username);
+    }
+
+    @PutMapping(value="/users/edit")
+    public void putUser(@RequestBody User user) throws UserNotFoundException {
+        logger.info("[PUT] /users/edit");
+        usersService.putUser(user);
+    }
+
+    @GetMapping(value = "/check_health")
+    public ResponseEntity checkHealth(){
+        logger.info("[GET] /check_health");
+
+        return usersService.check_health();
     }
 
 }

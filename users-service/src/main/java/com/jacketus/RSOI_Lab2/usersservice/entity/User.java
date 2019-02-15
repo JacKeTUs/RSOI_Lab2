@@ -21,7 +21,7 @@ public class User {
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "BUY_NUM")
+    @Column(name = "BUY_NUM", columnDefinition = "integer default 0")
     private int buy_num;
 
 

@@ -3,7 +3,10 @@ package com.jacketus.RSOI_Lab2.purchasesservice.service;
 import com.jacketus.RSOI_Lab2.purchasesservice.entity.Purchase;
 import com.jacketus.RSOI_Lab2.purchasesservice.exception.PurchaseNotFoundException;
 import com.jacketus.RSOI_Lab2.purchasesservice.repository.PurchasesRepository;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,5 +65,29 @@ public class PurchasesServiceImplementation implements PurchasesService{
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
         purchase.setRating(rating);
         purchasesRepository.save(purchase);
+    }
+
+    @Override
+    public ResponseEntity check_health() {
+        JSONObject json1 = new JSONObject();
+        try {
+            json1.put("info", "Purchases MService");
+            json1.put("version", 0.4);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(json1.toString());
+    }
+
+
+    @Override
+    public Purchase putPurchase(Purchase p) throws PurchaseNotFoundException {
+        return purchasesRepository.findById(p.getId()).map(Purchase -> {
+            Purchase.setUserID(p.getUserID());
+            Purchase.setSongID(p.getSongID());
+            Purchase.setRating(p.getRating());
+            return purchasesRepository.save(Purchase);
+        }).orElseThrow(() -> new PurchaseNotFoundException(p.getId()));
     }
 }

@@ -2,6 +2,7 @@ package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
 import org.apache.http.HttpResponse;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,9 @@ public interface GatewayService {
 
     String oauth_exchangecode(String auth_url, String code, String redirect_uri, String client_cred) throws IOException;
 
+    // Проверка всех всех МС
+    String checkAllServices() throws IOException;
+
     // Просмотреть все песни
     String getSongs(PageRequest p) throws IOException;
 
@@ -25,7 +29,7 @@ public interface GatewayService {
     String getUserById(Long userId) throws IOException;
 
     // Посмотреть все песни пользователя (все его покупки)
-    String getSongsByUser(@PathVariable Long userId) throws IOException;
+    ResponseEntity getSongsByUser(@PathVariable Long userId) throws IOException;
 
     // Посмотреть песню пользователя (рейтинг)
     String getUserSong(@PathVariable Long userId, @PathVariable Long songId) throws IOException;
@@ -34,13 +38,13 @@ public interface GatewayService {
     String getPurchase(@PathVariable Long ID) throws IOException;
 
     // Покупка песни
-    void purchaseSong(@RequestBody String purchase) throws IOException;
+    ResponseEntity purchaseSong(@RequestBody String purchase) throws IOException;
 
     // Добавить пользователя
-    void addUser(@RequestBody String user) throws IOException;
+    ResponseEntity addUser(@RequestBody String user) throws IOException;
 
     // Оценка песни
-    void addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException;
+    ResponseEntity addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException;
 
     // Добавить песню
     void addSong(@RequestBody String song) throws IOException;

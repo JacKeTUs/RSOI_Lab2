@@ -3,7 +3,11 @@ package com.jacketus.RSOI_Lab2.usersservice.service;
 import com.jacketus.RSOI_Lab2.usersservice.entity.User;
 import com.jacketus.RSOI_Lab2.usersservice.exception.UserNotFoundException;
 import com.jacketus.RSOI_Lab2.usersservice.repository.UsersRepository;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,4 +52,29 @@ public class UsersServiceImplementation implements UsersService{
     public User createUser(User user) {
         return usersRepository.save(user);
     }
+
+
+    @Override
+    public ResponseEntity check_health() {
+        JSONObject json1 = new JSONObject();
+        try {
+            json1.put("info", "Users M Service");
+            json1.put("version", 0.4);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(json1.toString());
+    }
+
+    @Override
+    public User putUser(User newUser) throws UserNotFoundException {
+        return usersRepository.findById(newUser.getId()).map(User -> {
+            User.setName(newUser.getName());
+            User.setLogin(newUser.getLogin());
+            User.setBuy_num(newUser.getBuy_num());
+            return usersRepository.save(User);
+        }).orElseThrow(() -> new UserNotFoundException(newUser.getId()));
+    }
+
 }
