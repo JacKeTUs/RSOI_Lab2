@@ -15,6 +15,9 @@ public interface GatewayService {
 
     String oauth_exchangecode(String auth_url, String code, String redirect_uri, String client_cred) throws IOException;
 
+    // Проверка всех всех МС
+    String checkAllServices() throws IOException;
+
     // Просмотреть все песни
     String getSongs(PageRequest p) throws IOException;
 

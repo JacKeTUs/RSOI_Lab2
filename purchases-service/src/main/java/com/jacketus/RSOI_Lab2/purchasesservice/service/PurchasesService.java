@@ -2,6 +2,7 @@ package com.jacketus.RSOI_Lab2.purchasesservice.service;
 
 import com.jacketus.RSOI_Lab2.purchasesservice.entity.Purchase;
 import com.jacketus.RSOI_Lab2.purchasesservice.exception.PurchaseNotFoundException;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -13,5 +14,7 @@ public interface PurchasesService {
     List<Purchase> getAllPurchases();
     Purchase createPurchase(Purchase purchase);
     void rate(Long id, int rating) throws PurchaseNotFoundException;
+
+    ResponseEntity check_health();
 }
 

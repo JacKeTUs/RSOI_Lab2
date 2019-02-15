@@ -3,7 +3,10 @@ package com.jacketus.RSOI_Lab2.purchasesservice.service;
 import com.jacketus.RSOI_Lab2.purchasesservice.entity.Purchase;
 import com.jacketus.RSOI_Lab2.purchasesservice.exception.PurchaseNotFoundException;
 import com.jacketus.RSOI_Lab2.purchasesservice.repository.PurchasesRepository;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,4 +66,18 @@ public class PurchasesServiceImplementation implements PurchasesService{
         purchase.setRating(rating);
         purchasesRepository.save(purchase);
     }
+
+    @Override
+    public ResponseEntity check_health() {
+        JSONObject json1 = new JSONObject();
+        try {
+            json1.put("info", "Purchases MService");
+            json1.put("version", 0.4);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(json1.toString());
+    }
+
 }

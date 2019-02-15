@@ -257,4 +257,14 @@ public class GatewayServiceController {
         gatewayService.addSong(song);
         return ResponseEntity.ok("ok");
     }
+
+
+    @GetMapping(value = "/check_health")
+    public ResponseEntity checkHealth() throws IOException {
+        logger.info("[GET] /check_health ");
+
+
+
+        return ResponseEntity.ok(gatewayService.checkAllServices());
+    }
 }

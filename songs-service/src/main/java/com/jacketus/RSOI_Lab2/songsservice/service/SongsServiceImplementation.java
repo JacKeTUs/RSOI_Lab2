@@ -3,10 +3,13 @@ package com.jacketus.RSOI_Lab2.songsservice.service;
 import com.jacketus.RSOI_Lab2.songsservice.entity.Song;
 import com.jacketus.RSOI_Lab2.songsservice.exception.SongNotFoundException;
 import com.jacketus.RSOI_Lab2.songsservice.repository.SongsRepository;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -72,6 +75,19 @@ public class SongsServiceImplementation implements SongsService {
                 .orElseThrow(() -> new SongNotFoundException(id));
 
         return song.getBuy_nums();
+    }
+
+    @Override
+    public ResponseEntity check_health() {
+        JSONObject json1 = new JSONObject();
+        try {
+            json1.put("info", "Song MService");
+            json1.put("version", 0.4);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(json1.toString());
     }
 
 

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,4 +63,12 @@ public class SongsServiceController {
         logger.info("[POST] /songs/" + id + "/buy");
         songsService.incBuyNum(id);
     }
+
+    @GetMapping(value = "/check_health")
+    public ResponseEntity checkHealth(){
+        logger.info("[GET] /check_health");
+
+        return songsService.check_health();
+    }
+
 }

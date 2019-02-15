@@ -2,6 +2,7 @@ package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -12,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -66,7 +68,13 @@ public class GatewayServiceImplementation implements GatewayService {
         while (i < 3) {
             request.removeHeaders("Authorization");
             request.addHeader("Authorization", "Bearer " + token.toString());
-            response = httpClient.execute(request);
+            try {
+                response = httpClient.execute(request);
+            } catch (HttpHostConnectException e) {
+                response.setStatusCode(500);
+                response.setEntity(new StringEntity(String.format("Service %s temporarily unavailable", service_url)));
+                return response;
+            }
             if (response.getStatusLine().getStatusCode() == 401 || response.getStatusLine().getStatusCode() == 403) {
                 token.delete(0, token.length());
                 String t = "";
@@ -395,5 +403,44 @@ public class GatewayServiceImplementation implements GatewayService {
         users_token = sb.toString();
 
         return EntityUtils.toString(response.getEntity());
+    }
+
+    @Override
+    public String checkAllServices() throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        JSONArray array = new JSONArray();
+
+        HttpGet request = new HttpGet(usersServiceUrl + "/check_health");
+        HttpResponse response;
+        StringBuilder sb = new StringBuilder(users_token);
+        response = this.executeRequestWithAuth(request, sb, usersServiceUrl);
+        users_token = sb.toString();
+        /*
+        if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 401 && response.getStatusLine().getStatusCode() != 403)
+            array.put("Users service temporarily unavailable");
+        else*/
+            array.put(EntityUtils.toString(response.getEntity()));
+
+
+        request = new HttpGet(songsServiceUrl + "/check_health");
+        sb = new StringBuilder(songs_token);
+        response = this.executeRequestWithAuth(request, sb, songsServiceUrl);
+        songs_token = sb.toString();
+       /* if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 401 && response.getStatusLine().getStatusCode() != 403)
+            array.put("Songs service temporarily unavailable");
+        else*/
+            array.put(EntityUtils.toString(response.getEntity()));
+
+
+        request = new HttpGet(purchasesServiceUrl + "/check_health");
+        sb = new StringBuilder(purchases_token);
+        response = this.executeRequestWithAuth(request, sb, purchasesServiceUrl);
+        purchases_token = sb.toString();
+        /*if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 401 && response.getStatusLine().getStatusCode() != 403)
+            array.put("Purchases service temporarily unavailable");
+        else*/
+            array.put(EntityUtils.toString(response.getEntity()));
+
+        return array.toString();
     }
 }
