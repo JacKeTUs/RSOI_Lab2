@@ -70,9 +70,14 @@ public class UsersServiceImplementation implements UsersService{
     @Override
     public User putUser(User newUser) throws UserNotFoundException {
         return usersRepository.findById(newUser.getId()).map(User -> {
-            User.setName(newUser.getName());
-            User.setLogin(newUser.getLogin());
-            User.setBuy_num(newUser.getBuy_num());
+            if (newUser.getName() != null && !newUser.getName().isEmpty())
+                User.setName(newUser.getName());
+            if (newUser.getLogin() != null && !newUser.getLogin().isEmpty())
+                User.setLogin(newUser.getLogin());
+            if (newUser.getDescription() != null && !newUser.getDescription().isEmpty())
+                User.setDescription(newUser.getDescription());
+            /*if (newUser.getType() != null && !newUser.getType().isEmpty())
+                User.setDescription(newUser.getDescription());*/
             return usersRepository.save(User);
         }).orElseThrow(() -> new UserNotFoundException(newUser.getId()));
     }

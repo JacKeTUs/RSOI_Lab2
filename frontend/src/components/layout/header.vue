@@ -2,11 +2,12 @@
     <div class="header" v-bind:class="{'active':scrolled}">
         <h1 >
             <router-link to="/" class="logo">
-                Музыкальная библиотека
+                Библиотека
             </router-link>
         </h1>
         <div class="header-right">
-            <router-link to="/songs">Список песен</router-link>
+            <router-link to="/search">Поиск книг</router-link>
+            <router-link to="/books">Список книг</router-link>
             <router-link to="/user">Мой профиль</router-link>
         </div>
     </div>

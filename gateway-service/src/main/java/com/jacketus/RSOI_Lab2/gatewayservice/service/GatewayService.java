@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 
 
@@ -16,45 +18,55 @@ public interface GatewayService {
 
     String oauth_exchangecode(String auth_url, String code, String redirect_uri, String client_cred) throws IOException;
 
+    File downloadBook(Long id) throws IOException;
+
     // Проверка всех всех МС
     String checkAllServices() throws IOException;
 
-    // Просмотреть все песни
-    String getSongs(PageRequest p) throws IOException;
+    // Просмотреть все книги
+    String getBooks(PageRequest p) throws IOException;
 
-    // Просмотреть одну песню
-    String getSongByID(@PathVariable Long songID) throws IOException;
+    // Просмотреть одну книгу
+    String getBookByID(@PathVariable Long bookID) throws IOException;
 
     // Посмотреть информацию о пользователе
     String getUserById(Long userId) throws IOException;
 
-    // Посмотреть все песни пользователя (все его покупки)
-    ResponseEntity getSongsByUser(@PathVariable Long userId) throws IOException;
+    // Посмотреть все книги пользователя (все его покупки)
+    ResponseEntity getBooksByUser(@PathVariable Long userId) throws IOException;
 
-    // Посмотреть песню пользователя (рейтинг)
-    String getUserSong(@PathVariable Long userId, @PathVariable Long songId) throws IOException;
+    // Посмотреть книгу пользователя (рейтинг)
+    String getUserBook(@PathVariable Long userId, @PathVariable Long bookId) throws IOException;
 
     // Посмотреть информацию о покупке
-    String getPurchase(@PathVariable Long ID) throws IOException;
+    String getLicense(@PathVariable Long ID) throws IOException;
 
-    // Покупка песни
-    ResponseEntity purchaseSong(@RequestBody String purchase) throws IOException;
+    // Покупка книги
+    ResponseEntity licenseBook(@RequestBody String license) throws IOException;
 
     // Добавить пользователя
     ResponseEntity addUser(@RequestBody String user) throws IOException;
 
-    // Оценка песни
-    ResponseEntity addRatingForSong(@PathVariable Long userID, @PathVariable Long songID, @RequestParam(value = "rating") int rate) throws IOException;
+    // Оценка книги
+    ResponseEntity addRatingForBook(@PathVariable Long userID, @PathVariable Long bookID, @RequestParam(value = "rating") int rate) throws IOException;
 
-    // Добавить песню
-    void addSong(@RequestBody String song) throws IOException;
+    // Добавить книгу
+    HttpResponse addBook(@RequestBody String book) throws IOException;
 
     // Запросить токен у URL
     HttpResponse askToken(String url, String clientCred) throws IOException;
+
+    HttpResponse register_user(String auth_url, String user) throws IOException;
 
     // Проверить токен
     HttpResponse checkToken(String auth_url, String token) throws IOException;
 
     // Найти пользователя по имени
     String getUserByLogin(String username) throws IOException;
+
+    void uploadBook(@RequestParam(value = "file") MultipartFile book, String id) throws IOException;
+
+    String searchBooks(String body, PageRequest p) throws IOException;
+
+    String putUser(String user) throws Exception;
 }

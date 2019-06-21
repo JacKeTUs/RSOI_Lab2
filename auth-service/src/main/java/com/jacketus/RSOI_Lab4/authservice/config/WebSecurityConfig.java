@@ -36,6 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/oauth/check_token").authenticated()
                 .antMatchers("/oauth/token").permitAll()
                 .antMatchers("/oauth/authorize").permitAll()
+                .antMatchers("/register_user").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .httpBasic()

@@ -4,8 +4,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Entity
 @Table(name = "USERS")
@@ -21,9 +19,23 @@ public class User {
     @Column(name = "NAME")
     private String name;
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "DESCRIPTION")
+    private String description;
+
     @Column(name = "BUY_NUM", columnDefinition = "integer default 0")
     private int buy_num;
 
+    @Column(name = "TYPE", columnDefinition = "integer default 0")
+    private int type;   //  0 - User
+                        //  1 - Author
 
     public Long getId() {
         return id;
@@ -49,6 +61,14 @@ public class User {
         return buy_num;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public void setBuy_num(int buy_num) {
         this.buy_num = buy_num;
     }
@@ -66,6 +86,8 @@ public class User {
                 .append(login, user.login)
                 .append(name, user.name)
                 .append(buy_num, user.buy_num)
+                .append(type, user.type)
+                .append(description, user.description)
                 .isEquals();
     }
 
@@ -76,6 +98,8 @@ public class User {
                 .append(login)
                 .append(name)
                 .append(buy_num)
+                .append(type)
+                .append(description)
                 .toHashCode();
     }
 
@@ -85,7 +109,9 @@ public class User {
                     "id=" + id + ", " +
                     "login='" + login + '\'' + ", " +
                     "name='" + name + '\'' + ", " +
-                    "buy_num='" + buy_num + '\'' +
+                    "description='" + description + '\'' + ", " +
+                    "buy_num='" + buy_num + '\'' + ", " +
+                    "type='" + type + '\'' +
                 '}';
     }
 }

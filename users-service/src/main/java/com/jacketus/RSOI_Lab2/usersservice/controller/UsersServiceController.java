@@ -48,7 +48,7 @@ public class UsersServiceController {
 
     // Покупка пользователем песни
     @PostMapping(value = "/users/{id}/buy")
-    public void userBuySong(@PathVariable Long id) throws UserNotFoundException {
+    public void userBuyBook(@PathVariable Long id) throws UserNotFoundException {
         logger.info("[POST] /users/" + id + "/buy");
         usersService.incBuyNum(id);
     }

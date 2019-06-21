@@ -33,9 +33,9 @@
     </parent>
 
 	<modules>
-		<module>songs-service</module>
+		<module>books-service</module>
 		<module>users-service</module>
-		<module>purchases-service</module>
+		<module>licenses-service</module>
 		<module>gateway-service</module>
 		<module>frontend</module>
         <module>auth-service</module>

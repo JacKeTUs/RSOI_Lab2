@@ -42,16 +42,40 @@ export default new Router({
         beforeEnter: ifAuthenticated,
     },
     {
-        path: '/songs',
-        name: 'songs',
-        component: () => import('./views/Songs.vue'),
+        path: '/books',
+        name: 'books',
+        component: () => import('./views/Books.vue'),
         beforeEnter: ifAuthenticated,
     },
     {
-        path: '/song/:id',
-        name: 'Song',
-        component: () => import('./views/Song.vue'),
+        path: '/book/:id',
+        name: 'Book',
+        component: () => import('./views/Book.vue'),
         beforeEnter: ifAuthenticated,
-    }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('./views/Register.vue'),
+      beforeEnter: ifNotAuthenticated,
+    },
+    {
+      path: '/books/upload',
+      name: 'LoadBook',
+      component: () => import('./views/LoadBook.vue'),
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/search',
+      name: 'Search',
+      component: () => import('./views/Search.vue'),
+      beforeEnter: ifAuthenticated,
+    },
+      {
+          path: '/users/edit',
+          name: 'UsersEdit',
+          component: () => import('./views/EditUser.vue'),
+          beforeEnter: ifAuthenticated,
+      }
   ]
 })

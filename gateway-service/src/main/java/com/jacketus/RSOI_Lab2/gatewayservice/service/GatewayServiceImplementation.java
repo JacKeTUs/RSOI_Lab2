@@ -2,10 +2,14 @@ package com.jacketus.RSOI_Lab2.gatewayservice.service;
 
 import com.jacketus.RSOI_Lab2.gatewayservice.redisq.JedisManager;
 import com.jacketus.RSOI_Lab2.gatewayservice.redisq.WorkThread;
+
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -18,16 +22,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 
 @Service
 public class GatewayServiceImplementation implements GatewayService {
-    final private String songsServiceUrl = "http://localhost:8070";
+    final private String booksServiceUrl = "http://localhost:8070";
     final private String usersServiceUrl = "http://localhost:8071";
-    final private String purchasesServiceUrl = "http://localhost:8072";
+    final private String licensesServiceUrl = "http://localhost:8072";
 
     // @Value( "${client.id}" )
     private String client_id = "gateway";
@@ -35,8 +43,8 @@ public class GatewayServiceImplementation implements GatewayService {
     private String client_secret = "secret";
 
     private String gateway_token = "";
-    private String songs_token = "";
-    private String purchases_token = "";
+    private String books_token = "";
+    private String licenses_token = "";
     private String users_token = "";
 
     private Jedis jedis = new Jedis("127.0.0.1", 6379);
@@ -112,27 +120,27 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
     @Override
-    public String getSongs(PageRequest p) throws IOException {
+    public String getBooks(PageRequest p) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(songsServiceUrl + "/songs?page="+p.getPageNumber() + "&size=" + p.getPageSize());
+        HttpGet request = new HttpGet(booksServiceUrl + "/books?page="+p.getPageNumber() + "&size=" + p.getPageSize());
         HttpResponse response;
 
-        StringBuilder sb = new StringBuilder(songs_token);
-        response = this.executeRequestWithAuth(request, sb, songsServiceUrl);
-        songs_token = sb.toString();
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
 
         return EntityUtils.toString(response.getEntity());
     }
 
     @Override
-    public String getSongByID(Long songID) throws IOException {
+    public String getBookByID(Long bookID) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(songsServiceUrl + "/songs/"+songID);
+        HttpGet request = new HttpGet(booksServiceUrl + "/books/"+bookID);
         HttpResponse response;
 
-        StringBuilder sb = new StringBuilder(songs_token);
-        response = this.executeRequestWithAuth(request, sb, songsServiceUrl);
-        songs_token = sb.toString();
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
 
         return EntityUtils.toString(response.getEntity());
     }
@@ -152,7 +160,7 @@ public class GatewayServiceImplementation implements GatewayService {
 
     // Деградация.
     @Override
-    public ResponseEntity getSongsByUser(Long userId) throws IOException {
+    public ResponseEntity getBooksByUser(Long userId) throws IOException {
         String res = "", res2 = "";
         int status_code = 200;
         JSONObject json_res = new JSONObject();
@@ -168,14 +176,17 @@ public class GatewayServiceImplementation implements GatewayService {
         res = EntityUtils.toString(response1.getEntity());
         if (response1.getStatusLine().getStatusCode() != 200)
             status_code = response1.getStatusLine().getStatusCode();
+        System.out.println(res);
 
-        request = new HttpGet(purchasesServiceUrl + "/purchases/find/?user_id=" + userId);
+        request = new HttpGet(licensesServiceUrl + "/licenses/find/?user_id=" + userId);
         HttpResponse response2;
 
-        StringBuilder sb2 = new StringBuilder(purchases_token);
-        response2 = this.executeRequestWithAuth(request, sb2, purchasesServiceUrl);
-        purchases_token = sb2.toString();
+        StringBuilder sb2 = new StringBuilder(licenses_token);
+        response2 = this.executeRequestWithAuth(request, sb2, licensesServiceUrl);
+
+        licenses_token = sb2.toString();
         res2 = EntityUtils.toString(response2.getEntity());
+        System.out.println(res2);
 
         if (response2.getStatusLine().getStatusCode() != 200)
             status_code = response2.getStatusLine().getStatusCode();
@@ -189,7 +200,7 @@ public class GatewayServiceImplementation implements GatewayService {
                 json2 = new JSONArray();
                 json2.put(new JSONObject(res2));
             }
-            json1.put("songs", json2);
+            json1.put("books", json2);
 
             return ResponseEntity.status(status_code).body(json1.toString());
         } catch (JSONException e) {
@@ -206,15 +217,15 @@ public class GatewayServiceImplementation implements GatewayService {
 
 
     @Override
-    public String getUserSong(Long userId, Long songId) throws IOException {
+    public String getUserBook(Long userId, Long bookId) throws IOException {
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/check?user_id=" + userId + "&song_id=" + songId);
+        HttpGet request = new HttpGet(licensesServiceUrl + "/licenses/check?user_id=" + userId + "&book_id=" + bookId);
         HttpResponse response;
 
-        StringBuilder sb = new StringBuilder(purchases_token);
-        response = this.executeRequestWithAuth(request, sb, purchasesServiceUrl);
-        purchases_token = sb.toString();
+        StringBuilder sb = new StringBuilder(licenses_token);
+        response = this.executeRequestWithAuth(request, sb, licensesServiceUrl);
+        licenses_token = sb.toString();
 
         Long p_id = -1L;
         try {
@@ -229,16 +240,16 @@ public class GatewayServiceImplementation implements GatewayService {
                 res.put("license", "false");
             } else {
                 res.put("license", "true");
-                res.put("purchase", this.getPurchase(p_id));
-                request = new HttpGet(songsServiceUrl + "/songs/" + songId);
+                res.put("license", this.getLicense(p_id));
+                request = new HttpGet(booksServiceUrl + "/books/" + bookId);
                 HttpResponse response3;
 
-                StringBuilder sb2 = new StringBuilder(songs_token);
-                response3 = this.executeRequestWithAuth(request, sb2, songsServiceUrl);
-                songs_token = sb2.toString();
+                StringBuilder sb2 = new StringBuilder(books_token);
+                response3 = this.executeRequestWithAuth(request, sb2, booksServiceUrl);
+                books_token = sb2.toString();
 
                 if (response3.getStatusLine().getStatusCode() == 200)
-                    res.put("song", EntityUtils.toString(response3.getEntity()));
+                    res.put("book", EntityUtils.toString(response3.getEntity()));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -247,15 +258,15 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
     @Override
-    public String getPurchase(Long ID) throws IOException {
+    public String getLicense(Long ID) throws IOException {
         String res = "";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/" + ID);
+        HttpGet request = new HttpGet(licensesServiceUrl + "/licenses/" + ID);
         HttpResponse response2;
 
-        StringBuilder sb2 = new StringBuilder(purchases_token);
-        response2 = this.executeRequestWithAuth(request, sb2, purchasesServiceUrl);
-        purchases_token = sb2.toString();
+        StringBuilder sb2 = new StringBuilder(licenses_token);
+        response2 = this.executeRequestWithAuth(request, sb2, licensesServiceUrl);
+        licenses_token = sb2.toString();
 
         res += EntityUtils.toString(response2.getEntity());
 
@@ -265,20 +276,20 @@ public class GatewayServiceImplementation implements GatewayService {
 
     // Очередь
     @Override
-    public ResponseEntity purchaseSong(@RequestBody String purchase) throws IOException {
+    public ResponseEntity licenseBook(@RequestBody String license) throws IOException {
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         int status_code = 200;
         JSONObject res = new JSONObject();
-        String p2 = purchase;
-        StringEntity p = new StringEntity(purchase);
+        String p2 = license;
+        StringEntity p = new StringEntity(license);
 
         // Проверяем, есть ли такие песни в базах
-        Long songID = -1L;
+        Long bookID = -1L;
         Long userID = -1L;
         try {
             JSONObject j = new JSONObject(p2);
-            songID = j.getLong("songID");
+            bookID = j.getLong("bookID");
             userID = j.getLong("userID");
         } catch (Exception e) {
 
@@ -293,12 +304,12 @@ public class GatewayServiceImplementation implements GatewayService {
         }
 
         // Проверка, есть ли такая песня
-        HttpGet request1 = new HttpGet(songsServiceUrl + "/songs/"+songID);
+        HttpGet request1 = new HttpGet(booksServiceUrl + "/books/"+bookID);
         HttpResponse response1;
 
-        StringBuilder sb1 = new StringBuilder(songs_token);
-        response1 = this.executeRequestWithAuth(request1, sb1, songsServiceUrl);
-        songs_token = sb1.toString();
+        StringBuilder sb1 = new StringBuilder(books_token);
+        response1 = this.executeRequestWithAuth(request1, sb1, booksServiceUrl);
+        books_token = sb1.toString();
 
         // Проверка, есть ли такой пользователь
         HttpGet request2 = new HttpGet(usersServiceUrl + "/users/"+userID);
@@ -312,23 +323,23 @@ public class GatewayServiceImplementation implements GatewayService {
                 !EntityUtils.toString(response2.getEntity()).isEmpty()) {
 
 
-            HttpPost request3 = new HttpPost(purchasesServiceUrl + "/purchases");
+            HttpPost request3 = new HttpPost(licensesServiceUrl + "/licenses");
             request3.addHeader("content-type", "application/json");
             request3.setEntity(p);
             HttpResponse response3;
 
             try {
-                StringBuilder sb3 = new StringBuilder(purchases_token);
-                response3 = this.executeRequestWithAuth(request3, sb3, purchasesServiceUrl);
-                purchases_token = sb3.toString();
+                StringBuilder sb3 = new StringBuilder(licenses_token);
+                response3 = this.executeRequestWithAuth(request3, sb3, licensesServiceUrl);
+                licenses_token = sb3.toString();
                 if (response3.getStatusLine().getStatusCode() != 200) {
-                    throw new Exception("Purchases not available");
+                    throw new Exception("Licenses not available");
                 }
             } catch (Exception e) {
                 // Ошибка. Добавляем в редиску
-                request3 = (HttpPost)buildRequestWithAuth(request3, new StringBuilder(purchases_token));
+                request3 = (HttpPost)buildRequestWithAuth(request3, new StringBuilder(licenses_token));
                 try {
-                    jedisManager.addReqToQueue("POST", request3, Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()), purchasesServiceUrl);
+                    jedisManager.addReqToQueue("POST", request3, Base64.getEncoder().encodeToString((client_id + ":" + client_secret).getBytes()), licensesServiceUrl);
                     workThread.start();
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
@@ -344,16 +355,16 @@ public class GatewayServiceImplementation implements GatewayService {
             users_token = sb4.toString();
 
             // Обновление счетчика покупок у песни
-            HttpPost request5 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/buy");
+            HttpPost request5 = new HttpPost(booksServiceUrl + "/books/"+bookID+"/buy");
 
-            StringBuilder sb5 = new StringBuilder(songs_token);
-            this.executeRequestWithAuth(request5, sb5, songsServiceUrl);
-            songs_token = sb5.toString();
+            StringBuilder sb5 = new StringBuilder(books_token);
+            this.executeRequestWithAuth(request5, sb5, booksServiceUrl);
+            books_token = sb5.toString();
         }
         else {
-            System.out.println("No user or song");
+            System.out.println("No user or book");
             try {
-                res.put("error", "User or song not found");
+                res.put("error", "User or book not found");
             } catch (JSONException e1) {
                 e1.printStackTrace();
             }
@@ -371,17 +382,22 @@ public class GatewayServiceImplementation implements GatewayService {
         JSONObject res = new JSONObject();
         // Валидация
         Long userID = -1L;
-        String login, name;
+        String login, name, pswd;
         try {
             JSONObject j = new JSONObject(user);
             // userID = j.getLong("userID");
-            login = j.getString("login");
-            name = j.getString("name");
-
+            login = j.getString("username");
+            // pswd = j.getString("password");
+            //name = j.getString("name");
+/*
             if (login.contains(" ") || name.contains(" ") ||
                 login.contains("\"") || name.contains("\"") ||
                         login.contains("\'") || name.contains("\'"))
                 throw new Exception();
+*/
+            j.put("login", login);
+            j.put("name", login);
+            user = j.toString();
         } catch (Exception e) {
 
             // Даннные неверны.
@@ -414,14 +430,14 @@ public class GatewayServiceImplementation implements GatewayService {
 
 
     // Полный откат
-    // Изменяются purchases и songs. Их и откатываем, если что...
+    // Изменяются licenses и books. Их и откатываем, если что...
     @Override
-    public ResponseEntity addRatingForSong(Long userID, Long songID, int rate) throws IOException {
+    public ResponseEntity addRatingForBook(Long userID, Long bookID, int rate) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         JSONObject res = new JSONObject();
 
         int status_code = 200;
-        if (userID < 0 || songID < 0 || rate < 0 || rate > 5) {
+        if (userID < 0 || bookID < 0 || rate < 0 || rate > 5) {
             // Даннные неверны.
             status_code = 400;
             try {
@@ -432,12 +448,12 @@ public class GatewayServiceImplementation implements GatewayService {
             return ResponseEntity.status(status_code).body(res.toString());
         }
 
-        HttpGet request = new HttpGet(purchasesServiceUrl + "/purchases/check?user_id=" + userID + "&song_id=" + songID);
+        HttpGet request = new HttpGet(licensesServiceUrl + "/licenses/check?user_id=" + userID + "&book_id=" + bookID);
         HttpResponse response;
 
-        StringBuilder sb = new StringBuilder(purchases_token);
-        response = this.executeRequestWithAuth(request, sb, purchasesServiceUrl);
-        purchases_token = sb.toString();
+        StringBuilder sb = new StringBuilder(licenses_token);
+        response = this.executeRequestWithAuth(request, sb, licensesServiceUrl);
+        licenses_token = sb.toString();
 
         Long p_id = 0L;
         try {
@@ -455,69 +471,69 @@ public class GatewayServiceImplementation implements GatewayService {
         }
 
 
-        JSONObject purchase = null;
-        JSONObject song = null;
+        JSONObject license = null;
+        JSONObject book = null;
 
-        HttpGet backupPurchases = new HttpGet(purchasesServiceUrl + "/purchases/" + p_id);
+        HttpGet backupLicenses = new HttpGet(licensesServiceUrl + "/licenses/" + p_id);
 
-        StringBuilder sb2 = new StringBuilder(purchases_token);
+        StringBuilder sb2 = new StringBuilder(licenses_token);
 
-        HttpResponse r = this.executeRequestWithAuth(backupPurchases, sb2, purchasesServiceUrl);
-        purchases_token = sb2.toString();
+        HttpResponse r = this.executeRequestWithAuth(backupLicenses, sb2, licensesServiceUrl);
+        licenses_token = sb2.toString();
 
         if (r.getStatusLine().getStatusCode() != 200) {
             status_code = r.getStatusLine().getStatusCode();
             try {
-                res.put("error", "Purchase service unavailable");
+                res.put("error", "License service unavailable");
             } catch (JSONException e1) {
                 e1.printStackTrace();
             }
         }
         else {
             try {
-                purchase = new JSONObject(EntityUtils.toString(r.getEntity()));
+                license = new JSONObject(EntityUtils.toString(r.getEntity()));
             } catch (JSONException ignored) {
             }
         }
-        HttpGet backupSongs = new HttpGet(songsServiceUrl + "/songs/" + p_id);
+        HttpGet backupBooks = new HttpGet(booksServiceUrl + "/books/" + p_id);
 
-        StringBuilder sb3 = new StringBuilder(songs_token);
-        HttpResponse rs = this.executeRequestWithAuth(backupSongs, sb3, songsServiceUrl);
-        songs_token = sb3.toString();
+        StringBuilder sb3 = new StringBuilder(books_token);
+        HttpResponse rs = this.executeRequestWithAuth(backupBooks, sb3, booksServiceUrl);
+        books_token = sb3.toString();
 
         if (rs.getStatusLine().getStatusCode() != 200) {
             status_code = rs.getStatusLine().getStatusCode();
             try {
-                res.put("error", "Songs service unavailable");
+                res.put("error", "Books service unavailable");
             } catch (JSONException e1) {
                 e1.printStackTrace();
             }
         }
         else {
             try {
-                song = new JSONObject(EntityUtils.toString(rs.getEntity()));
+                book = new JSONObject(EntityUtils.toString(rs.getEntity()));
             } catch (JSONException ignored) {
             }
         }
 
-        HttpPost request2 = new HttpPost(purchasesServiceUrl + "/purchases/"+p_id+"/rate?rating=" + rate);
-        HttpPost request3 = new HttpPost(songsServiceUrl + "/songs/"+songID+"/rate?rating=" + rate);
+        HttpPost request2 = new HttpPost(licensesServiceUrl + "/licenses/"+p_id+"/rate?rating=" + rate);
+        HttpPost request3 = new HttpPost(booksServiceUrl + "/books/"+bookID+"/rate?rating=" + rate);
         HttpResponse resp;
 
         try {
             //httpClient.execute(request2);
-            sb2 = new StringBuilder(purchases_token);
-            resp = this.executeRequestWithAuth(request2, sb2, purchasesServiceUrl);
-            purchases_token = sb2.toString();
+            sb2 = new StringBuilder(licenses_token);
+            resp = this.executeRequestWithAuth(request2, sb2, licensesServiceUrl);
+            licenses_token = sb2.toString();
             if (resp.getStatusLine().getStatusCode() != 200) {
                 status_code = rs.getStatusLine().getStatusCode();
                 throw new Exception();
             }
 
             //httpClient.execute(request3);
-            sb3 = new StringBuilder(songs_token);
-            resp = this.executeRequestWithAuth(request3, sb3, songsServiceUrl);
-            songs_token = sb3.toString();
+            sb3 = new StringBuilder(books_token);
+            resp = this.executeRequestWithAuth(request3, sb3, booksServiceUrl);
+            books_token = sb3.toString();
 
             if (resp.getStatusLine().getStatusCode() != 200) {
                 status_code = rs.getStatusLine().getStatusCode();
@@ -532,14 +548,14 @@ public class GatewayServiceImplementation implements GatewayService {
         } catch (Exception e) {
             // Откатываемся. Статус коды сохранены.
 
-            if (purchase != null) {
-                HttpPost rollbackP = new HttpPost(purchasesServiceUrl + "/purchases");
-                rollbackP.setEntity(new StringEntity(purchase.toString()));
+            if (license != null) {
+                HttpPost rollbackP = new HttpPost(licensesServiceUrl + "/licenses");
+                rollbackP.setEntity(new StringEntity(license.toString()));
                 httpClient.execute(rollbackP);
             }
-            if (song != null) {
-                HttpPost rollbackS = new HttpPost(songsServiceUrl + "/songs");
-                rollbackS.setEntity(new StringEntity(song.toString()));
+            if (book != null) {
+                HttpPost rollbackS = new HttpPost(booksServiceUrl + "/books");
+                rollbackS.setEntity(new StringEntity(book.toString()));
                 httpClient.execute(rollbackS);
             }
             try {
@@ -553,19 +569,51 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
     @Override
-    public void addSong(@RequestBody String song) throws IOException {
+    public HttpResponse addBook(String book) throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        StringEntity p = new StringEntity(song);
-        HttpPost request = new HttpPost(songsServiceUrl + "/songs");
+        StringEntity p = new StringEntity(book);
+        HttpPost request = new HttpPost(booksServiceUrl + "/books");
         request.addHeader("content-type", "application/json");
         request.setEntity(p);
         HttpResponse response;
 
-        StringBuilder sb = new StringBuilder(songs_token);
-        response = this.executeRequestWithAuth(request, sb, songsServiceUrl);
-        songs_token = sb.toString();
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
+
+        return response;
     }
 
+    @Override
+    public void uploadBook(@RequestParam(value="file") MultipartFile book, String id) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpResponse response;
+
+
+        File tempFile = null;
+        try {
+            String extension = ".uploaded";
+            tempFile = File.createTempFile(book.getOriginalFilename(), extension);
+            book.transferTo(tempFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        org.apache.http.HttpEntity data = MultipartEntityBuilder.create()
+                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .addBinaryBody("file", book.getBytes(), ContentType.DEFAULT_BINARY, id + ".fb2")
+                .addTextBody("text", book.getOriginalFilename(), ContentType.DEFAULT_BINARY)
+                .build();
+
+        HttpPost request = new HttpPost(booksServiceUrl + "/upload");
+        request.setEntity(data);
+       // request.addHeader("content-type", "multipart/form-data");
+
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
+    }
 
     @Override
     public HttpResponse askToken(String url, String clientCred) throws IOException {
@@ -575,6 +623,17 @@ public class GatewayServiceImplementation implements GatewayService {
 
         return httpClient.execute(request1);
     }
+
+    @Override
+    public HttpResponse register_user(String auth_url, String user) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request1 = new HttpPost(auth_url + "/register_user");
+        request1.addHeader("content-type", "application/json");
+        request1.setEntity(new StringEntity(user));
+
+        return httpClient.execute(request1);
+    }
+
 
     @Override
     public HttpResponse checkToken(String auth_url, String token) throws IOException {
@@ -621,6 +680,27 @@ public class GatewayServiceImplementation implements GatewayService {
     }
 
     @Override
+    public File downloadBook(Long id) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpGet request = new HttpGet(booksServiceUrl + "/download/" + id);
+
+        HttpResponse response;
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        users_token = sb.toString();
+
+        HttpEntity ent = response.getEntity();
+        File myFile = new File("tmpfile");
+        if (ent != null) {
+            try (FileOutputStream outstream = new FileOutputStream(myFile)) {
+                ent.writeTo(outstream);
+            }
+        }
+        return myFile;
+    }
+
+    @Override
     public String checkAllServices() throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         JSONArray array = new JSONArray();
@@ -637,25 +717,58 @@ public class GatewayServiceImplementation implements GatewayService {
             array.put(EntityUtils.toString(response.getEntity()));
 
 
-        request = new HttpGet(songsServiceUrl + "/check_health");
-        sb = new StringBuilder(songs_token);
-        response = this.executeRequestWithAuth(request, sb, songsServiceUrl);
-        songs_token = sb.toString();
+        request = new HttpGet(booksServiceUrl + "/check_health");
+        sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
        /* if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 401 && response.getStatusLine().getStatusCode() != 403)
-            array.put("Songs service temporarily unavailable");
+            array.put("Books service temporarily unavailable");
         else*/
             array.put(EntityUtils.toString(response.getEntity()));
 
 
-        request = new HttpGet(purchasesServiceUrl + "/check_health");
-        sb = new StringBuilder(purchases_token);
-        response = this.executeRequestWithAuth(request, sb, purchasesServiceUrl);
-        purchases_token = sb.toString();
+        request = new HttpGet(licensesServiceUrl + "/check_health");
+        sb = new StringBuilder(licenses_token);
+        response = this.executeRequestWithAuth(request, sb, licensesServiceUrl);
+        licenses_token = sb.toString();
         /*if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 401 && response.getStatusLine().getStatusCode() != 403)
-            array.put("Purchases service temporarily unavailable");
+            array.put("Licenses service temporarily unavailable");
         else*/
             array.put(EntityUtils.toString(response.getEntity()));
 
         return array.toString();
+    }
+
+    @Override
+    public String searchBooks(String body, PageRequest p) throws IOException {
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(booksServiceUrl + "/search?page="+p.getPageNumber() + "&size=" + p.getPageSize());
+        HttpResponse response;
+
+        request.setEntity(new StringEntity(body.toString()));
+
+        StringBuilder sb = new StringBuilder(books_token);
+        response = this.executeRequestWithAuth(request, sb, booksServiceUrl);
+        books_token = sb.toString();
+
+        return EntityUtils.toString(response.getEntity());
+
+    }
+
+    @Override
+    public String putUser(String body) throws Exception {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPut request = new HttpPut(usersServiceUrl + "/users/edit");
+        HttpResponse response;
+
+        request.addHeader("content-type", "application/json");
+        request.setEntity(new StringEntity(body.toString()));
+
+        StringBuilder sb = new StringBuilder(users_token);
+        response = this.executeRequestWithAuth(request, sb, usersServiceUrl);
+        users_token = sb.toString();
+
+        return EntityUtils.toString(response.getEntity());
     }
 }

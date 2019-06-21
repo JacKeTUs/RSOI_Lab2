@@ -4,12 +4,13 @@
             <p class="card-text">
                 <strong>Имя:</strong> {{ user.name }} {{ user.lastName }}<br/>
                 <strong>Логин:</strong> {{ user.login }}<br/>
-                <strong>Количество покупок:</strong> {{ user.buy_num }}<br/>
+                <strong>О себе:</strong> {{ user.description }}<br/>
+                <strong>Количество книг:</strong> {{ user.buy_num }}<br/>
             </p>
 
-            <h3>Песни пользователя</h3>
-            <div class="songs-list" v-bind:key="song.id" v-for="song in user.songs">
-                <UserSongItem v-bind:purchase="song"></UserSongItem>
+            <h3>Книги пользователя</h3>
+            <div class="books-list" v-bind:key="book.id" v-for="book in user.books">
+                <UserBookItem v-bind:purchase="book"></UserBookItem>
             </div>
         </b-card>
 
@@ -18,11 +19,11 @@
 </template>
 
 <script>
-    import UserSongItem from '../components/UserSongItem';
+    import UserBookItem from '../components/UserBookItem';
     import axios from 'axios';
     export default{
         name: "UserItem",
-        components: {UserSongItem},
+        components: {UserBookItem},
         props: ["user"],
         methods:{
             updateData() {
@@ -42,7 +43,7 @@
         },
         data() {
             return {
-                songs: [],
+                books: [],
                 user: {}
             }
         },

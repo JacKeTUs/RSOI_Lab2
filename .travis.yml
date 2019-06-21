@@ -7,11 +7,11 @@ services:
 - postgresql
 
 before_script:
-- psql -c "create database songs_db" -U postgres
+- psql -c "create database books_db" -U postgres
 - psql -c "create database users_db" -U postgres
 - psql -c "create database purchases_db" -U postgres
 - psql -c "create role program WITH password 'test'" -U postgres
-- psql -c "grant all privileges ON database songs_db TO program" -U postgres
+- psql -c "grant all privileges ON database books_db TO program" -U postgres
 - psql -c "grant all privileges ON database users_db TO program" -U postgres
 - psql -c "grant all privileges ON database purchases_db TO program" -U postgres
 - psql -c "alter role program WITH login" -U postgres

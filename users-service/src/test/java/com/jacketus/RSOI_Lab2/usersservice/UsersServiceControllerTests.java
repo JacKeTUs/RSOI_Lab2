@@ -111,7 +111,7 @@ public class UsersServiceControllerTests {
     }
 
     @Test
-    public void buySong() throws Exception {
+    public void buyBook() throws Exception {
         List<User> users = new ArrayList<>();
 
         User user = new User();

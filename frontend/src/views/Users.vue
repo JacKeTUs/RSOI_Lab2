@@ -7,6 +7,16 @@
         <div class="userItem" v-for="user">
             <UserItem v-bind:user="user"></UserItem>
         </div>
+        <div id="load_book">
+            <b-button
+                    v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" v-on:click="load_book" v-if="user.type"  style="margin: 10px">Загрузить книгу</b-button>
+
+        </div>
+        <div id="edit_profile">
+            <b-button
+                    v-b-toggle.collapse1 class="btn btn-info btn-sm shadowed-button" v-on:click="edit_profile"  style="margin: 10px">Изменить профиль</b-button>
+
+        </div>
 
     </div>
 </template>
@@ -30,6 +40,13 @@
                 this.$store.commit('UNLOGIN_SUCCESS');
                 this.$router.push("/");
             },
+            load_book() {
+
+                this.$router.push("/books/upload");
+            },
+            edit_profile() {
+                this.$router.push("/users/edit");
+            },
             addUser(_user){
 
                 setTimeout(() => {this.updateData()}, 500);
@@ -48,7 +65,7 @@
                 } else {
                     this.authenticated = false;
                 };
-                axios.get("/api/users/" + this.$store.getters.get_user_id + "/songs", {
+                axios.get("/api/users/" + this.$store.getters.get_user_id + "/books", {
                     headers: {
                         Authorization: 'Bearer ' + this.$store.getters.get_token
                     }
